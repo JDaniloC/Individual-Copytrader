@@ -1,4 +1,4 @@
-# CopyTrader API
+# CopyTrader
 
 ## About
 This application uses the Google Cloud VM to host a simple server that provides the communication between the main trader and their clients.
@@ -33,4 +33,5 @@ This application uses the Google Cloud VM to host a simple server that provides 
 
 ## Important links
 [Simple Python 3 HTTP server for logging all GET and POST requests](https://gist.github.com/mdonkers/63e115cc0c79b4f6b8b3a6b797e485c7)
+
 [How to access Google Cloud Engine instance's IP address via browser](https://stackoverflow.com/questions/36758460/how-to-access-google-cloud-engine-instances-ip-address-via-browser/51437065#51437065)
