@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Copy Trader </title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/trade.css">
+    <link rel="stylesheet" href="styles/trade-map.css">
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="script.js"></script>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+</head>
+<body> 
+    <header>
+        <div class="asset" onclick = "showOthers()">
+            <img src="https://static.cdnpub.info/files/storage/public/5b/50/81ba56509.svg" alt="asset icon">
+            <div>
+                <h3> EUR/USD </h3>
+                <p> Digital </p>
+            </div>
+        </div>
+        <div class="asset-chooser">
+            <div class="option-chooser">
+                <button onclick = "generateAssets('Digital')"> Digital </button>
+                <button onclick = "generateAssets('Binary')"> Binary </button>
+            </div>
+            <ul class="others">
+                
+            </ul>
+        </div>
+    </header>
+    <hr>
+    <main>
+        <div class="wrapper"> 
+            <div class="trade-map">
+    
+            </div>
+        </div>
+        <div class="trade">
+            <div class="chooser">
+                <p> Time </p>
+                <select name="timeframe" id="timeframe" 
+                    onChange = "changeTime(this)">
+                    <option value="M1"> M1 </option>
+                    <option value="M5"> M5 </option>
+                    <option value="M15"> M15 </option>
+                </select>
+            </div>
+            <div class="chooser">
+                <p> Amount </p>
+                <input onChange="changeAmount(this)" 
+                    type="number" min="0" max="20000" value = 2>
+            </div>
+
+            <button id="call-btn" onclick = "placeCall()">
+                <img src="images/call.png" alt="Call button">
+            </button>
+            <button id="put-btn" onclick = "placePut()">
+                <img src="images/put.png" alt="Put button">
+            </button>
+            <button onClick="captureCandles()">
+                Começar
+            </button>
+            <button onClick="stopCandles()">
+                Parar
+            </button>
+        </div>
+    </main>
+    <script>
+        generateAssets();
+        captureCandles();
+    </script>
+</body>
+</html>
