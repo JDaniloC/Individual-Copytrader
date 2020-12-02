@@ -1,0 +1,24 @@
+main ul {
+    display: flex;
+    flex-wrap: wrap;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+main ul li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1 1 15%;
+    padding: 1em;
+    margin: 0.5em;
+    background-color: #25272b;
+    color: #fff;
+    border-radius: 3px;
+    list-style: none;
+}
+
+main ul li > * {
+    margin: 0.5em;
+}
