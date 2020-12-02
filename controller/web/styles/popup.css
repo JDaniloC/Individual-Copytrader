@@ -1,0 +1,50 @@
+.overlay {
+    display: flex;
+    opacity: 0;
+    position: absolute;
+    justify-content: center;
+
+    top: 40%;
+    width: 100vw;
+
+    z-index: 4;
+    pointer-events: none;
+}
+
+.overlay#animated {
+    animation: showup 1.5s ease-in-out;
+}
+
+.overlay div {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+    width: 40vw;
+    padding: 1em;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.overlay div img {
+    width: 8em;
+}
+
+.overlay div p {
+    font-size: 2em;
+    color: #000;
+    font-weight: bolder;
+}
+
+@keyframes showup {
+    0% {
+        top: 100%;
+        opacity: 100%;
+    }
+    10% {
+        top: 40%;
+    }
+    70% {
+        opacity: 100%;
+    }
+}
