@@ -6,6 +6,7 @@
     <title> Copy Trader </title>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/login.css">
     <link rel="stylesheet" href="styles/trade.css">
     <link rel="stylesheet" href="styles/trade-map.css">
     <link rel="stylesheet" href="styles/popup.css">
@@ -17,6 +18,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
 </head>
 <body> 
+    <section class="login">
+    </section>
+    <section class="login">
+        <form onsubmit= "login(event)">
+            <h2> CopyTrader Host Login </h2>
+            <input placeholder = "E-mail da IQ" type="email" required>
+            <input placeholder = "Senha" type="password" required>
+            <button type = "submit"> Entrar </button>
+        </form>
+    </section>
     <header>
         <div class="operations">
             <div class="asset" onclick = "showOthers()">
@@ -80,9 +91,5 @@
             <p> Ordem adicionada! </p>
         </div>
     </div>
-    <script>
-        generateAssets();
-        captureCandles();
-    </script>
 </body>
 </html>

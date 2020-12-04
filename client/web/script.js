@@ -134,7 +134,7 @@ async function login(event) {
     const email = document.querySelector(".login input[type=email]").value
     const password = document.querySelector(".login input[type=password]").value
     const button = document.querySelector(".login button")
-    button.innerHTML = '<img src="images/loading.svg" id="loading">';
+    button.innerText = 'Acessando...';
     const result = await eel.verify_connection(email, password)();
     if (result !== null) {
         document.querySelector("section.login").style.display = "none"; 
@@ -145,6 +145,6 @@ async function login(event) {
             document.querySelector("header img").style.opacity = 1
         }
     } else {
-        button.innerHTML = 'Entrar';
+        button.innerText = 'Entrar';
     }
 }

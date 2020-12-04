@@ -285,3 +285,20 @@ function createOrder(asset, order, type, timeframe) {
         } 
     }, 1000);
 }
+
+async function login(event) {
+    event.preventDefault();
+    const email = document.querySelector(".login input[type=email]").value
+    const password = document.querySelector(".login input[type=password]").value
+    const button = document.querySelector(".login button")
+    button.innerText = 'Acessando...';
+    const result = await eel.login(email, password)();
+    if (result) {
+        document.querySelectorAll("section.login").forEach(
+            element => { element.style.display = "none" }) 
+    } else {
+        button.innerText = 'Entrar';
+    }
+    captureCandles();
+    generateAssets();
+}

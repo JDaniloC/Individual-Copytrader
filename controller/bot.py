@@ -9,15 +9,21 @@ def esperar_proximo_minuto():
 
 class IQOption:
     def __init__(self):
-        self.API = IQ_Option("daniloedaniel123@gmail.com", "Danilo123")
-        self.API.connect()
-        self.API.change_balance("PRACTICE")
+        self.API = None
         self.asset = "EURUSD"
         self.option = "digital"
         self.timeframe = 60
         self.amount = 2
         self.updating = False
     
+    def login(self, email, password):
+        self.API = IQ_Option(email, password)
+        self.API.connect()
+        if self.API.check_connect():
+            self.API.change_balance("PRACTICE")
+            return True
+        return False
+
     def get_candles(self):
         candles = self.API.get_candles(self.asset, self.timeframe, 20, time.time())
         result = []
@@ -109,12 +115,19 @@ class IQOption:
 api = IQOption()
 
 @eel.expose
+def login(email, password):
+    if api.login(email, password):
+        return True
+    return False
+
+@eel.expose
 def start_capture():
     threading.Thread(
         target = api.update_candles, daemon=True).start()
 @eel.expose
 def stop_capture():
     api.updating = False
+    
 @eel.expose
 def change_asset(asset):
     api.asset = asset['title'].replace(
@@ -122,6 +135,7 @@ def change_asset(asset):
     api.option = asset['option'].lower()
     api.timeframe = asset['timeframe']
     api.amount = asset['amount']
+
 @eel.expose
 def operate(direcao):
     threading.Thread(
