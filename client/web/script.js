@@ -66,7 +66,22 @@ const assets = [
     {title: "AUDCAD", image: 
     "https://static.cdnpub.info/files/storage/public/5b/50/820142ec6.svg"}
 ];
-
+function prevent(event) {
+    event.preventDefault();
+}
+function openConfig() {
+    document.querySelector("section.config").style.display = "flex";
+}
+function closeConfig() {
+    document.querySelector("section.config").style.display = "none";
+}
+function saveConfig() {
+    const amount = document.querySelector("section.config input[name=amount]").value;
+    const stopwin = document.querySelector("section.config input[name=stopwin]").value;
+    const stoploss = document.querySelector("section.config input[name=stoploss]").value;
+    eel.change_config(amount, stopwin, stoploss);
+    closeConfig();
+}
 function getImage(asset) {
     for (var i = 0; i < assets.length; i++) {
         if (assets[i].title === asset) {
@@ -114,11 +129,22 @@ function setResult(id, result) {
     document.querySelector(`li h3#id${id}`).innerText = result
 }
 
-eel.verify_connection()((result) => {
-    if (result) {
-        const status = document.querySelector("header p")
-        status.className = "online"
-        status.textContent = "Online"
-        document.querySelector("header img").style.opacity = 1
+async function login(event) {
+    event.preventDefault();
+    const email = document.querySelector(".login input[type=email]").value
+    const password = document.querySelector(".login input[type=password]").value
+    const button = document.querySelector(".login button")
+    button.innerHTML = '<img src="images/loading.svg" id="loading">';
+    const result = await eel.verify_connection(email, password)();
+    if (result !== null) {
+        document.querySelector("section.login").style.display = "none"; 
+        if (result) {
+            const status = document.querySelector("header p")
+            status.className = "online"
+            status.textContent = "Online"
+            document.querySelector("header img").style.opacity = 1
+        }
+    } else {
+        button.innerHTML = 'Entrar';
     }
-});
+}

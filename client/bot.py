@@ -6,15 +6,21 @@ SERVER_URL = "http://34.69.19.239:8000/"
 
 class IQOption:
     def __init__(self):
-        self.API = IQ_Option("daniloedaniel123@gmail.com", "Danilo123")
-        self.API.connect()
-        self.API.change_balance("PRACTICE")
+        self.API = None
         self.amount = 2
         self.stopwin = 10
         self.stoploss = 10
         self.earn = 0
         self.id = 0
     
+    def login(self, email, password):
+        self.API = IQ_Option(email, password)
+        self.API.connect()
+        if self.API.check_connect():
+            self.API.change_balance("PRACTICE")
+            return True
+        return False
+
     def ordem(self, par, tipo, direcao, tempo):
         id = self.id
         eel.placeTrade(par.upper(), direcao.upper(), tempo, id)
@@ -73,12 +79,22 @@ class IQOption:
 api = IQOption()
 
 @eel.expose
-def verify_connection():
+def verify_connection(email, password):
+    if not api.login(email, password):
+        return None
     try:
         requests.get(SERVER_URL)
         threading.Thread(target = api.auto_trade, daemon = True).start()
         return True
-    except Exception as e: return False
+    except Exception as e: 
+        return False
+
+@eel.expose
+def change_config(amount, stopwin, stoploss):
+    api.amount = float(amount)
+    api.stopwin = float(stopwin)
+    api.stoploss = float(stoploss)
+    eel.updateInfos(api.earn, api.stopwin, api.stoploss)
 
 eel.init('web')
 eel.start('index.html')
