@@ -1,100 +1,179 @@
-from iqoptionapi.stable_api import IQ_Option
-import eel, requests, time, json, threading
-from datetime import datetime
+import re, traceback
+def escreve_erros(erro):
+    linhas = " -> ".join(re.findall(
+        r'line \d+', str(traceback.extract_tb(erro.__traceback__))))
+    with open("errors.log", "a") as file:
+        file.write(f"{type(erro)} - {erro}:\n{linhas}\n")
 
-SERVER_URL = "http://34.69.19.239:8000/"
+try:
+    from iqoptionapi.stable_api import IQ_Option
+    import eel, time, json, threading, requests
 
-class IQOption:
-    def __init__(self):
-        self.API = None
-        self.amount = 2
-        self.stopwin = 10
-        self.stoploss = 10
-        self.earn = 0
-        self.id = 0
-    
-    def login(self, email, password):
-        self.API = IQ_Option(email, password)
-        self.API.connect()
-        if self.API.check_connect():
-            self.API.change_balance("PRACTICE")
+    from datetime import datetime, timedelta
+    from cryptography.fernet import Fernet
+    from dontpad import Dontpad
+    from os import listdir
+
+    class IQOption:
+        def __init__(self):
+            self.API = None
+            self.amount = 2
+            self.stopwin = 10
+            self.stoploss = 10
+            self.earn = 0
+            self.id = 0
+            self.wait = 5   
+            self.url = "0192837465"
+            self.account = "train"
+
+        def change_balance(self, balance):
+            if self.API != None:
+                if not balance and self.account != "real":
+                    self.API.change_balance("REAL")
+                    self.account = "real"
+                elif self.account != "train":
+                    self.API.change_balance("PRACTICE")
+                    self.account = "train"
+
+        def login(self, email, password):
+            self.API = IQ_Option(email, password)
+            self.API.connect()
+            if self.API.check_connect():
+                self.API.change_balance("PRACTICE")
+                return True
+            return False
+
+        def ordem(self, par, tipo, direcao, tempo):
+            id = self.id
+            eel.placeTrade(par.upper(), direcao.upper(), tempo, id)
+            self.id += 1
+
+            if tipo == "binary" and tempo == 5:
+                atual = datetime.utcnow()
+                if ((atual.minute % 5 == 4 and atual.second < 30) 
+                    or atual.minute % 5 < 4): 
+                    tempo = 5 - (atual.minute % 5)
+
+            if tipo == "binary":
+                status, identificador = self.API.buy(
+                    self.amount, par, direcao, tempo)
+            else:
+                status, identificador = self.API.buy_digital_spot(
+                    par, self.amount, direcao, tempo)
+                
+            if not status:
+                return "error", 0
+
+            lucro = 0
+            if tipo == "binary":
+                resultado, lucro = self.API.check_win_v4(identificador)
+            else:
+                status = False
+                while not status:
+                    status, lucro = self.API.check_win_digital_v2(identificador)
+                    time.sleep(0.5)
+                if lucro > 0: 
+                    resultado = "win"
+                elif lucro < 0: 
+                    resultado = "loose"
+                else: 
+                    resultado = "equal"
+
+            if resultado == "win": self.earn += lucro
+            elif resultado == "loose": self.earn -= abs(lucro)
+            eel.setResult(id, resultado.upper())
+            eel.updateInfos(self.earn, self.stopwin, self.stoploss)
+
+            return resultado, lucro
+
+        def auto_trade(self):
+            while self.earn < self.stopwin and self.earn < -self.stoploss:
+                # response = json.loads(requests.get(SERVER_URL).text)
+                response = json.loads(
+                    Dontpad.read("copytrader/" + self.url))
+                try:
+                    for trade in response['orders']:
+                        if time.time() - trade['timestamp'] < self.wait + 1.5:
+                            par, tipo = trade['asset'], trade['type']
+                            direcao = trade['order']
+                            tempo = trade['timeframe']
+                            threading.Thread(
+                                target = self.ordem, daemon = True,
+                                args=(par, tipo, direcao, tempo)).start()
+                except: pass
+                time.sleep(self.wait)
+
+    api = IQOption()
+    eel.init('web')
+
+    @eel.expose
+    def verify_connection(email, password):
+        if not api.login(email, password):
+            return None
+        try:
+            # requests.get(SERVER_URL)
+            Dontpad.read("copytrader/")
+            threading.Thread(
+                target = api.auto_trade, daemon = True).start()
             return True
-        return False
+        except Exception as e: 
+            return False
 
-    def ordem(self, par, tipo, direcao, tempo):
-        id = self.id
-        eel.placeTrade(par.upper(), direcao.upper(), tempo, id)
-        self.id += 1
-
-        if tipo == "binary" and tempo == 5:
-            atual = datetime.utcnow()
-            if ((atual.minute % 5 == 4 and atual.second < 30) 
-                or atual.minute % 5 < 4): 
-                tempo = 5 - (atual.minute % 5)
-
-        if tipo == "binary":
-            status, identificador = self.API.buy(
-                self.amount, par, direcao, tempo)
-        else:
-            status, identificador = self.API.buy_digital_spot(
-                par, self.amount, direcao, tempo)
+    def save_config():
+        dic = {
+            "id": api.url,
+            "account": api.account,
+            "amount": api.amount,
+            "stopwin": api.stopwin,
+            "stoploss": api.stoploss,
+            "wait": api.wait
+        }
+        with open("config/data.json", "w") as file:
+            json.dump(dic, file, indent = 2)
             
-        if not status:
-            return "error", 0
+    @eel.expose
+    def change_config(account, amount, stopwin, stoploss, wait):
+        api.change_balance(account)
+        api.amount = float(amount)
+        api.stopwin = float(stopwin)
+        api.stoploss = float(stoploss)
+        api.wait = int(wait)
+        save_config()
+        eel.updateInfos(api.earn, api.stopwin, api.stoploss)
 
-        lucro = 0
-        if tipo == "binary":
-            resultado, lucro = self.API.check_win_v4(identificador)
-        else:
-            status = False
-            while not status:
-                status, lucro = self.API.check_win_digital_v2(identificador)
-                time.sleep(0.5)
-            if lucro > 0: 
-                resultado = "win"
-            elif lucro < 0: 
-                resultado = "loose"
-            else: 
-                resultado = "equal"
+    with open("config/data.json") as file:
+        resultado = json.load(file)
+        api.url = resultado['id']
+        eel.changeConfig(resultado)
 
-        if resultado == "win": self.earn += lucro
-        elif resultado == "loose": self.earn -= abs(lucro)
-        eel.setResult(id, resultado.upper())
-        eel.updateInfos(self.earn, self.stopwin, self.stoploss)
-
-        return resultado, lucro
-
-    def auto_trade(self):
-        while self.earn < self.stopwin and self.earn < self.stoploss:
-            response = json.loads(requests.get(SERVER_URL).text)
-            for trade in response['orders']:
-                if time.time() - trade['timestamp'] < 5:
-                    par, tipo = trade['asset'], trade['type']
-                    direcao = trade['order']
-                    tempo = trade['timeframe']
-                    threading.Thread(target = self.ordem, daemon = True,
-                        args=(par, tipo, direcao, tempo)).start()
-            time.sleep(5)
-
-api = IQOption()
-
-@eel.expose
-def verify_connection(email, password):
-    if not api.login(email, password):
-        return None
+    key = b'iQQ0XYfhCbxT7GNwx39mUiNeLpxk_gN3jGRjb-NLuFQ='
+    f = Fernet(key)
     try:
-        requests.get(SERVER_URL)
-        threading.Thread(target = api.auto_trade, daemon = True).start()
-        return True
-    except Exception as e: 
-        return False
+        files = listdir(".")
+        indice = list(map(lambda x:".key" in x, files)).index(True)
+        with open(files[indice], "rb") as file:
+            message = f.decrypt(file.readline())
+            message = message.decode()
+            email, data, horario = message.split("|")
+            dia, mes, ano = list(map(int, data.split("/")))
+            hora, minuto = list(map(int, horario.split(":")))
+    except:
+        email = ""
+        dia, mes, ano, hora, minuto = 30, 12, 2021, 0, 0
+    
+    data_final = datetime(ano, mes, dia, hora, minuto)
+    tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())
 
-@eel.expose
-def change_config(amount, stopwin, stoploss):
-    api.amount = float(amount)
-    api.stopwin = float(stopwin)
-    api.stoploss = float(stoploss)
-    eel.updateInfos(api.earn, api.stopwin, api.stoploss)
+    if tempo_restante > 0:
+        restante = data_final - datetime.now()
+        horas_minutos = timedelta(seconds = tempo_restante)
+        duracao = str(horas_minutos)[:-7].replace('day', 'dia')
+        if "dias" not in duracao:
+            duracao += "h"
+        mensagem = f"O período teste dura {duracao}"
+        
+        eel.changeLicense(mensagem)
 
-eel.init('web')
-eel.start('index.html')
+        eel.start('index.html')
+except Exception as e:
+    escreve_erros(e)

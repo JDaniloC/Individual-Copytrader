@@ -66,20 +66,57 @@ const assets = [
     {title: "AUDCAD", image: 
     "https://static.cdnpub.info/files/storage/public/5b/50/820142ec6.svg"}
 ];
-function prevent(event) {
-    event.preventDefault();
-}
 function openConfig() {
-    document.querySelector("section.config").style.display = "flex";
+    document.querySelector(
+        "section.config"
+    ).style.display = "flex";
+    document.querySelector(
+        "section.overlay"
+    ).style.display = "flex";
 }
 function closeConfig() {
-    document.querySelector("section.config").style.display = "none";
+    document.querySelector(
+        "section.config"
+    ).style.display = "none";
+    document.querySelector(
+        "section.overlay"
+    ).style.display = "none";
+}
+eel.expose(changeConfig)
+function changeConfig(config) {
+    document.querySelector(
+        `section.config input#${config["account"]}`
+    ).checked = true;
+    console.log(config["account"])
+    document.querySelector(
+        "section.config input[name=amount]"
+    ).value = config["amount"];
+    document.querySelector(
+        "section.config input[name=stopwin]"
+    ).value = config["stopwin"];
+    document.querySelector(
+        "section.config input[name=stoploss]"
+    ).value = config["stoploss"];
+    document.querySelector(
+        "section.config input[name=wait]"
+    ).value = config["wait"];
+    saveConfig();
+    document.querySelector(
+        "section.overlay"
+    ).style.display = "flex";
 }
 function saveConfig() {
-    const amount = document.querySelector("section.config input[name=amount]").value;
-    const stopwin = document.querySelector("section.config input[name=stopwin]").value;
-    const stoploss = document.querySelector("section.config input[name=stoploss]").value;
-    eel.change_config(amount, stopwin, stoploss);
+    const account = document.querySelector(
+        "section.config input[name=account]").checked;
+    const amount = document.querySelector(
+        "section.config input[name=amount]").value;
+    const stopwin = document.querySelector(
+        "section.config input[name=stopwin]").value;
+    const stoploss = document.querySelector(
+        "section.config input[name=stoploss]").value;
+    const wait = document.querySelector(
+        "section.config input[name=wait]").value;
+    eel.change_config(account, amount, stopwin, stoploss, wait);
     closeConfig();
 }
 function getImage(asset) {
@@ -137,7 +174,12 @@ async function login(event) {
     button.innerText = 'Acessando...';
     const result = await eel.verify_connection(email, password)();
     if (result !== null) {
-        document.querySelector("section.login").style.display = "none"; 
+        document.querySelector(
+            "section.login"
+        ).style.display = "none"; 
+        document.querySelector(
+            "section.overlay"
+        ).style.display = "none"; 
         if (result) {
             const status = document.querySelector("header p")
             status.className = "online"
@@ -147,4 +189,10 @@ async function login(event) {
     } else {
         button.innerText = 'Entrar';
     }
+}
+eel.expose(changeLicense)
+function changeLicense(texto) {
+    document.querySelector(
+        "sub"
+    ).innerText = texto
 }

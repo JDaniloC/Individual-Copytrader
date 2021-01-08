@@ -1,7 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 
-class S(BaseHTTPRequestHandler):
+class Server(BaseHTTPRequestHandler):
     def _set_headers(self, code = 204):
         self.send_response(code)
         self.send_header("Content-type", "application/json")
@@ -33,7 +33,7 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write(self._json(post_data))
 
 
-def run(server_class=HTTPServer, handler_class=S, addr="localhost", port=8000):
+def run(server_class=HTTPServer, handler_class=Server, addr="localhost", port=8000):
     server_address = (addr, port)
     httpd = server_class(server_address, handler_class)
 

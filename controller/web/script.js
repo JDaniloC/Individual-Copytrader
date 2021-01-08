@@ -302,3 +302,9 @@ async function login(event) {
     captureCandles();
     generateAssets();
 }
+eel.expose(changeLicense)
+function changeLicense(texto) {
+    document.querySelector(
+        "sub"
+    ).innerText = texto
+}

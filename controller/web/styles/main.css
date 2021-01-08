@@ -95,3 +95,8 @@ header .asset-chooser ul.others li img {
     height: 3em;
     margin-right: 1em;
 }
+sub#license {
+    width: 100%;
+    font-size: 10px;
+    text-align: right;
+}

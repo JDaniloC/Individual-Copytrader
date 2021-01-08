@@ -15,28 +15,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
+    <section class="overlay">
+    </section>
     <section class="login">
         <form onsubmit= "login(event)">
             <h2> CopyTrader Login </h2>
             <input placeholder = "E-mail da IQ" type="email" required>
             <input placeholder = "Senha" type="password" required>
             <button type = "submit"> Entrar </button>
+            <sub> O período teste dura 14 dias </sub>
         </form>
     </section>
     <section class="config">
-        <form onsubmit= "prevent(event)">
+        <form onsubmit= "return false">
             <h2> 
                 Configurações 
                 <button class = "close" onclick = "closeConfig()"> 
                     x 
                 </button> 
             </h2>
+            <div style = "display:flex; font-size: xx-small;">
+                <div>
+                    <input type="radio" id = "train" 
+                        name = "account" value = "train">
+                    <label for="train"> Treino </label>
+                </div>
+                <div>
+                    <input type="radio" id = "real" 
+                        name = "account" value = "real">
+                    <label for="real"> Real </label>
+                </div>
+            </div>
+
             <label for="amount"> Valor da entrada </label>
             <input name = "amount" type = "number" min = 2 value = 2>
             <label for="stopwin"> Stop Win </label>
             <input name = "stopwin" type = "number" min = 2 value = 4>
             <label for="stoploss"> Stop Loss </label>
             <input name = "stoploss" type = "number" min = 2 value = 4>
+            <label for="wait"> Atualização </label>
+            <input name = "wait" type = "number" min = 1 value = 5>
             <button onclick = "saveConfig()"> Salvar </button>
         </form>
     </section>
@@ -62,11 +80,11 @@
         </div>
         <div>
             <h3> Stop Win </h3>
-            <p> R$ 0,00 </p>
+            <p> R$ 10,00 </p>
         </div>
         <div>
             <h3> Stop Loss </h3>
-            <p> R$ 0,00 </p>
+            <p> R$ 10,00 </p>
         </div>
     </footer>
 </body>
