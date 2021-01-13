@@ -87,19 +87,23 @@ try:
             return resultado, lucro
 
         def auto_trade(self):
-            while self.earn < self.stopwin and self.earn < -self.stoploss:
+            ultimo = ()
+            while self.earn < self.stopwin and self.earn > -self.stoploss:
                 # response = json.loads(requests.get(SERVER_URL).text)
                 response = json.loads(
                     Dontpad.read("copytrader/" + self.url))
                 try:
                     for trade in response['orders']:
-                        if time.time() - trade['timestamp'] < self.wait + 1.5:
+                        timestamp = trade['timestamp']
+                        if time.time() - timestamp < self.wait + 2:
                             par, tipo = trade['asset'], trade['type']
                             direcao = trade['order']
                             tempo = trade['timeframe']
-                            threading.Thread(
-                                target = self.ordem, daemon = True,
-                                args=(par, tipo, direcao, tempo)).start()
+                            if (par, timestamp) != ultimo:
+                                ultimo = (par, timestamp)
+                                threading.Thread(
+                                    target = self.ordem, daemon = True,
+                                    args=(par, tipo, direcao, tempo)).start()
                 except: pass
                 time.sleep(self.wait)
 
@@ -112,7 +116,7 @@ try:
             return None
         try:
             # requests.get(SERVER_URL)
-            Dontpad.read("copytrader/")
+            json.loads(Dontpad.read("copytrader/" + api.url))
             threading.Thread(
                 target = api.auto_trade, daemon = True).start()
             return True
@@ -146,20 +150,18 @@ try:
         api.url = resultado['id']
         eel.changeConfig(resultado)
 
-    key = b'iQQ0XYfhCbxT7GNwx39mUiNeLpxk_gN3jGRjb-NLuFQ='
+    key = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
     f = Fernet(key)
     try:
         files = listdir(".")
         indice = list(map(lambda x:".key" in x, files)).index(True)
         with open(files[indice], "rb") as file:
-            message = f.decrypt(file.readline())
-            message = message.decode()
-            email, data, horario = message.split("|")
+            message = f.decrypt(file.readline()).decode()
+            data, horario = message.split("|")
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
     except:
-        email = ""
-        dia, mes, ano, hora, minuto = 30, 12, 2021, 0, 0
+        dia, mes, ano, hora, minuto = 17, 1, 2021, 0, 0
     
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())

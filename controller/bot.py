@@ -171,20 +171,18 @@ try:
             daemon = True
         ).start()
 
-    key = b'iQQ0XYfhCbxT7GNwx39mUiNeLpxk_gN3jGRjb-NLuFQ='
+    key = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
     f = Fernet(key)
     try:
         files = listdir(".")
         indice = list(map(lambda x:".key" in x, files)).index(True)
         with open(files[indice], "rb") as file:
-            message = f.decrypt(file.readline())
-            message = message.decode()
-            email, data, horario = message.split("|")
+            message = f.decrypt(file.readline()).decode()
+            data, horario = message.split("|")
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
     except:
-        email = ""
-        dia, mes, ano, hora, minuto = 30, 12, 2021, 0, 0
+        dia, mes, ano, hora, minuto = 17, 1, 2021, 0, 0
     
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())
