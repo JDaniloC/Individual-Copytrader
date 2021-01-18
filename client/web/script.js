@@ -192,7 +192,12 @@ async function login(event) {
 }
 eel.expose(changeLicense)
 function changeLicense(texto) {
+    if (texto === "Renove sua licença") {
+        document.querySelector(
+            ".login button"
+        ).disabled = true;
+    }
     document.querySelector(
         "sub"
-    ).innerText = texto
+    ).innerText = texto;
 }

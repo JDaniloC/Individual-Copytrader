@@ -14,11 +14,6 @@ try:
     from dontpad import Dontpad
     from os import listdir
 
-    def esperar_proximo_minuto():
-        time.sleep(
-            (datetime.now() + timedelta(seconds = 50)
-        ).replace(second = 58).timestamp() - time.time())
-
     class IQOption:
         def __init__(self):
             self.API = None
@@ -137,7 +132,6 @@ try:
                 candles = self.get_candles()
                 eel.addCandles(candles)
                 time.sleep(5)
-                # esperar_proximo_minuto()
 
     api = IQOption()
     eel.init('web')
@@ -182,7 +176,7 @@ try:
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
     except:
-        dia, mes, ano, hora, minuto = 17, 1, 2021, 0, 0
+        dia, mes, ano, hora, minuto = 22, 1, 2021, 0, 0
     
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())
@@ -194,8 +188,10 @@ try:
         if "dias" not in duracao:
             duracao += "h"
         mensagem = f"O período teste dura {duracao}"
-        eel.changeLicense(mensagem)
-
-        eel.start('index.html', port = 8001)
+    else:
+        mensagem = "Renove sua licença"
+        api.url = None
+    eel.changeLicense(mensagem)
+    eel.start('index.html', port = 8001)
 except Exception as e:
     escreve_erros(e)

@@ -23,7 +23,7 @@ try:
             self.earn = 0
             self.id = 0
             self.wait = 5   
-            self.url = "0192837465"
+            self.url = ""
             self.account = "train"
 
         def change_balance(self, balance):
@@ -173,9 +173,10 @@ try:
         if "dias" not in duracao:
             duracao += "h"
         mensagem = f"O período teste dura {duracao}"
-        
-        eel.changeLicense(mensagem)
-
-        eel.start('index.html')
+    else:
+        mensagem = "Renove sua licença"
+        api.url = None
+    eel.changeLicense(mensagem)
+    eel.start('index.html')
 except Exception as e:
     escreve_erros(e)
