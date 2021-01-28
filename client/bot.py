@@ -7,7 +7,7 @@ def escreve_erros(erro):
 
 try:
     from iqoptionapi.stable_api import IQ_Option
-    import eel, time, json, threading, requests
+    import eel, time, json, threading
 
     from datetime import datetime, timedelta
     from cryptography.fernet import Fernet
@@ -89,7 +89,6 @@ try:
         def auto_trade(self):
             ultimo = ()
             while self.earn < self.stopwin and self.earn > -self.stoploss:
-                # response = json.loads(requests.get(SERVER_URL).text)
                 response = json.loads(
                     Dontpad.read("copytrader/" + self.url))
                 try:
@@ -145,13 +144,29 @@ try:
         save_config()
         eel.updateInfos(api.earn, api.stopwin, api.stoploss)
 
+    def get_data():
+        f = Fernet(b'yqzmMSzGGdoYCfIu_OCE5VEQeDh5v5M6vqjDqhAGYk0=')
+        try:
+            with open("config/data.dll", "rb") as file:
+                message = f.decrypt(file.readline()).decode()
+                config = json.loads(message)
+        except:
+            print("Erro...")
+            config = {
+                "titulo": "Copytrader",
+                "login": "CopyClient Login",
+                "nome": "CopyTrader",
+                "icone": ""
+            }
+        eel.changeData(config)
+
+    get_data()
     with open("config/data.json") as file:
         resultado = json.load(file)
         api.url = resultado['id']
         eel.changeConfig(resultado)
 
-    key = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
-    f = Fernet(key)
+    f = Fernet(b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50=')
     try:
         files = listdir(".")
         indice = list(map(lambda x:".key" in x, files)).index(True)
@@ -161,7 +176,7 @@ try:
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
     except:
-        dia, mes, ano, hora, minuto = 17, 1, 2021, 0, 0
+        dia, mes, ano, hora, minuto = 1, 2, 2021, 0, 0
     
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())

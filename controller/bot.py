@@ -7,7 +7,7 @@ def escreve_erros(erro):
 
 try: 
     from iqoptionapi.stable_api import IQ_Option
-    import eel, time, threading, json, requests
+    import eel, time, threading, json
 
     from datetime import datetime, timedelta
     from cryptography.fernet import Fernet
@@ -22,8 +22,7 @@ try:
             self.timeframe = 60
             self.amount = 2
             self.updating = False
-            with open("data.dll") as file:
-                self.url = file.read()
+            self.url = ""
         
         def login(self, email, password):
             self.API = IQ_Option(email, password)
@@ -67,12 +66,6 @@ try:
         
         def ordem(self, direcao):
             def enviar_sinal(par, direcao, tempo, tipo):
-                # requests.post("http://34.69.19.239:8000/", 
-                #     data=json.dumps({"orders": [{
-                #         "asset": par, "order": direcao, "type": tipo,
-                #         "timeframe": tempo, "timestamp": time.time()
-                #     }]}
-                # ))
                 Dontpad.write("copytrader/" + self.url, 
                     json.dumps({"orders": [{
                         "asset": par, "order": direcao, "type": tipo,
@@ -165,6 +158,27 @@ try:
             daemon = True
         ).start()
 
+    def get_data():
+        f = Fernet(b'yqzmMSzGGdoYCfIu_OCE5VEQeDh5v5M6vqjDqhAGYk0=')
+        try:
+            with open("config/data.dll", "rb") as file:
+                message = f.decrypt(file.readline()).decode()
+                config = json.loads(message)
+        except:
+            print("Erro...")
+            config = {
+                "titulo": "Copytrader",
+                "login": "CopyClient Login",
+                "nome": "CopyTrader",
+                "icone": ""
+            }
+        eel.changeData(config)
+
+    get_data()
+    with open("config/data.json") as file:
+        resultado = json.load(file)
+        api.url = resultado['id']
+
     key = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
     f = Fernet(key)
     try:
@@ -176,7 +190,7 @@ try:
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
     except:
-        dia, mes, ano, hora, minuto = 22, 1, 2021, 0, 0
+        dia, mes, ano, hora, minuto = 1, 2, 2021, 0, 0
     
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())

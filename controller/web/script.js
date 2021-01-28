@@ -313,3 +313,20 @@ function changeLicense(texto) {
         "sub"
     ).innerText = texto;
 }
+
+eel.expose(changeData)
+function changeData(data) {
+    document.title = data.titulo;
+    document.querySelector(
+        ".login h2"
+    ).innerText = data.login;
+    const nome = document.querySelector("header h1")
+    if (nome) {
+        nome.innerText = data.nome
+    }
+    if (data.icone !== "") {
+        document.querySelector(
+            "link[rel~='icon']"
+        ).href = data.icone
+    }
+}
