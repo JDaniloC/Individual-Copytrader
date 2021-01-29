@@ -181,10 +181,10 @@ async function login(event) {
             "section.overlay"
         ).style.display = "none"; 
         if (result) {
-            const status = document.querySelector("header p")
-            status.className = "online"
-            status.textContent = "Online"
-            document.querySelector("header img").style.opacity = 1
+            const status = document.querySelector("header p");
+            status.className = "online";
+            status.textContent = "Online";
+            document.querySelector("header img").style.opacity = 1;
         }
     } else {
         button.innerText = 'Entrar';
@@ -217,4 +217,12 @@ function changeData(data) {
             "link[rel~='icon']"
         ).href = data.icone
     }
+}
+
+eel.expose(changeStatus)
+function changeStatus() {
+    const status = document.querySelector("header p");
+    status.className = "offline";
+    status.textContent = "Bateu em um Stop!";
+    document.querySelector("header img").style.opacity = 0;
 }

@@ -105,6 +105,7 @@ try:
                                     args=(par, tipo, direcao, tempo)).start()
                 except: pass
                 time.sleep(self.wait)
+            eel.changeStatus()
 
     api = IQOption()
     eel.init('web')

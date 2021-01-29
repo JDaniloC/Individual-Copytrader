@@ -206,7 +206,7 @@ function changeTime(input) {
             timeframe = 300;
             break;
         default:
-            timeframe = 1800;
+            timeframe = 900;
     }
     order.timeframe = timeframe;
     eel.change_asset(order);

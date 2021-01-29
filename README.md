@@ -1,9 +1,11 @@
-# CopyTrader
+# CopyTrader for IQ Option
 
-## About
-This application uses the Google Cloud VM to host a simple server that provides the communication between the main trader and their clients.
+![copytrader start](.github/run.png)
 
-## Setup
+## Version 1 - Google Cloud Platform
+> This application uses the Google Cloud VM to host a simple server that provides the communication between the main trader and their clients.
+
+### Setup
 
 1. Creating and cloning the project
     1. Create a Ubuntu VM on Google Cloud
@@ -31,10 +33,20 @@ This application uses the Google Cloud VM to host a simple server that provides 
         screen -dmS server python3 server.py
         ```
 
-## Important links
+![copytrader start](.github/status.png)
+
+### Important links
 [Simple Python 3 HTTP server for logging all GET and POST requests](https://gist.github.com/mdonkers/63e115cc0c79b4f6b8b3a6b797e485c7)
 
 [How to access Google Cloud Engine instance's IP address via browser](https://stackoverflow.com/questions/36758460/how-to-access-google-cloud-engine-instances-ip-address-via-browser/51437065#51437065)
 
-## Another solution
-Using the dontpad web site, the bot writes and read json texts of this free web site, not being necessary to use GCloud
+## Version 2 - DontPad "database"
+> Using the dontpad web site, the bot writes and read json texts from this free web site, not being necessary to use GCloud
+
+### Setup
+Modify the "id" field in the config/data.json file, using the same word to "connect" the client to the controller. So generate a generator license using the gerador.py, and with the license file you can generate the new license file for the bots.
+
+<div style = "display:flex">
+    <img src=".github/login.png" width = "52%" alt = "login img">
+    <img src=".github/config.png" width = "48%" alt = "config img">
+</div>

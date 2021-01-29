@@ -3,6 +3,6 @@
   "account": "train",
   "amount": 5.0,
   "stopwin": 10.0,
-  "stoploss": 10.0,
+  "stoploss": 5.0,
   "wait": 1
 }
