@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,8 +22,17 @@
             <h2> CopyTrader Login </h2>
             <input placeholder = "E-mail da IQ" type="email" required>
             <input placeholder = "Senha" type="password" required>
-            <button type = "submit"> Entrar </button>
-            <sub> O período teste dura 14 dias </sub>
+            <div style = "display: flex">
+                <button type = "submit"> Entrar </button>
+                <button type = "button" onclick = 
+                    "document.querySelector('#licensefile').click()"> 
+                    Procurar licença 
+                </button>
+                <input type="file" id="licensefile" 
+                    onchange = "searchLicense(this)"
+                    style = "display:none">
+            </div>
+            <sub> Renove sua licença </sub>
         </form>
     </section>
     <section class="config">

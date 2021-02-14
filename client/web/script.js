@@ -191,7 +191,7 @@ async function login(event) {
     }
 }
 eel.expose(changeLicense)
-function changeLicense(texto) {
+function changeLicense(email, texto) {
     if (texto === "Renove sua licença") {
         document.querySelector(
             ".login button"
@@ -200,6 +200,25 @@ function changeLicense(texto) {
     document.querySelector(
         "sub"
     ).innerText = texto;
+    if (email != "") {
+        input = document.querySelector(
+            "input[type=email]")
+        input.value = email;
+        input.disabled = true;
+    }
+}
+
+function searchLicense(input) {
+    var reader = new FileReader(); 
+    reader.onload = function(){ 
+        let textFile = reader.result;
+        if (textFile) {
+            eel.search_license(textFile);
+        }
+    } 
+    if (input.value !== null) {
+      reader.readAsText(input.files[0]); 
+    }
 }
 
 eel.expose(changeData)

@@ -8,6 +8,9 @@ section.login {
     background-color: #000;
     opacity: 0.7;
 }
+section.login div * {
+    font-size: 1em !important;
+}
 section.login + section.login {
     opacity: 1;
     background-color: transparent;

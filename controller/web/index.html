@@ -25,7 +25,16 @@
             <h2> CopyTrader Host Login </h2>
             <input placeholder = "E-mail da IQ" type="email" required>
             <input placeholder = "Senha" type="password" required>
-            <button type = "submit"> Entrar </button>
+            <div style = "display: flex">
+                <button type = "submit"> Entrar </button>
+                <button type = "button" onclick = 
+                    "document.querySelector('#licensefile').click()"> 
+                    Procurar licença 
+                </button>
+                <input type="file" id="licensefile" 
+                    onchange = "searchLicense(this)"
+                    style = "display:none">
+            </div>
             <sub id = "license"></sub>
         </form>
     </section>

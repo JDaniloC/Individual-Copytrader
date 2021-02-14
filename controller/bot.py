@@ -165,7 +165,6 @@ try:
                 message = f.decrypt(file.readline()).decode()
                 config = json.loads(message)
         except:
-            print("Erro...")
             config = {
                 "titulo": "Copytrader",
                 "login": "CopyClient Login",
@@ -174,38 +173,71 @@ try:
             }
         eel.changeData(config)
 
+    def devolve_restante(tempo_restante):
+        if  tempo_restante < 0:
+            mensagem = "Renove sua licença"
+            api.url = None
+        else:
+            horas_minutos = timedelta(seconds = tempo_restante)
+            duracao = str(horas_minutos)[:-7].replace('days', 'dias')
+            if "dias" not in duracao:
+                duracao += "h"
+            mensagem = f"Sua licença dura {duracao}"
+        return mensagem
+
+    def procurar_licenca(filetext = ""):
+        f = Fernet(b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50=')
+        dia, mes, ano = 17, 2, 2021
+        email, hora, minuto = "", 0, 0
+
+        def decrypt(text):
+            message = f.decrypt(text).decode()
+            email, data, horario = message.split("|")
+            dia, mes, ano = list(map(int, data.split("/")))
+            hora, minuto = list(map(int, horario.split(":")))
+            return email, dia, mes, ano, hora, minuto
+
+        if filetext != "":
+            try:
+                email, dia, mes, ano, hora, minuto = decrypt(
+                    filetext.encode("utf-8"))
+            except Exception as e: print(type(e), e); filetext = ""
+        else:
+            try:
+                files = listdir(".")
+                indice = list(map(lambda x:".key" in x, files)).index(True)
+                with open(f"{files[indice]}", "rb") as file:
+                    email, dia, mes, ano, hora, minuto = decrypt(file.readline())
+            except:
+                try:
+                    with open("license.key", "rb") as file:
+                        message = f.decrypt(file.readline()).decode()
+                        dia, mes, ano = list(map(int, message.split("/")))
+                except Exception as e: 
+                    print(e)
+        
+        data_final = datetime(ano, mes, dia, hora, minuto)
+        tempo_restante = datetime.timestamp(data_final
+            ) - datetime.timestamp(datetime.now())
+
+        mensagem = devolve_restante(tempo_restante)
+        return mensagem, email, filetext
+
+    @eel.expose
+    def search_license(text):
+        mensagem, email, filetext = procurar_licenca(text)
+        eel.changeLicense(email, mensagem)
+        if filetext != "":
+            with open("license.key", "wb") as file:
+                file.write(filetext.encode("utf-8"))
+
     get_data()
     with open("config/data.json") as file:
         resultado = json.load(file)
         api.url = resultado['id']
 
-    key = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
-    f = Fernet(key)
-    try:
-        files = listdir(".")
-        indice = list(map(lambda x:".key" in x, files)).index(True)
-        with open(files[indice], "rb") as file:
-            message = f.decrypt(file.readline()).decode()
-            data, horario = message.split("|")
-            dia, mes, ano = list(map(int, data.split("/")))
-            hora, minuto = list(map(int, horario.split(":")))
-    except:
-        dia, mes, ano, hora, minuto = 1, 2, 2021, 0, 0
-    
-    data_final = datetime(ano, mes, dia, hora, minuto)
-    tempo_restante = datetime.timestamp(data_final) - datetime.timestamp(datetime.now())
-
-    if tempo_restante > 0:
-        restante = data_final - datetime.now()
-        horas_minutos = timedelta(seconds = tempo_restante)
-        duracao = str(horas_minutos)[:-7].replace('day', 'dia')
-        if "dias" not in duracao:
-            duracao += "h"
-        mensagem = f"O período teste dura {duracao}"
-    else:
-        mensagem = "Renove sua licença"
-        api.url = None
-    eel.changeLicense(mensagem)
+    mensagem, email, caminho = procurar_licenca()
+    eel.changeLicense(email, mensagem)
     eel.start('index.html', port = 8001)
 except Exception as e:
     escreve_erros(e)

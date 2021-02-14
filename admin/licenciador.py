@@ -68,6 +68,7 @@ class Gerador(Frame):
         Instancia todos os widgets e suas respectivas variáveis
         '''
         self.titulos = {
+            "email": StringVar(),
             "dia": IntVar(value = 1), 
             "mês": IntVar(value = 1),
             "ano": IntVar(value = 2021),
@@ -87,24 +88,25 @@ class Gerador(Frame):
         Pega o valor dos widgets e passa para o criar_licenca
         '''
         if self.atual < self.total:
+            email = self.titulos['email'].get()
             dia = str(self.titulos['dia'].get())
             mes = str(self.titulos['mês'].get())
             ano = self.titulos['ano'].get()
             hora = self.titulos['hora'].get()
             minuto = self.titulos['minuto'].get()
-            self.criar_licenca(dia, mes, ano, hora, minuto)
+            self.criar_licenca(email, dia, mes, ano, hora, minuto)
         else:
             messagebox.showwarning("Licença", 
         "Você atingiu o máximo de linceças geradas. Compre mais licenças.")
 
-    def criar_licenca(self, dia, mes, ano, hora, minuto): 
+    def criar_licenca(self, email, dia, mes, ano, hora, minuto): 
         '''
-        Criptografa uma mensagem com todos os dados (data e hora)
+        Criptografa uma mensagem com todos os dados (email e data)
         E escreve em um arquivo.
         '''
         f = Fernet(USERKEY)
-        with open("license.key", "wb") as file:
-            message = f"{dia}/{mes}/{ano}|{hora}:{minuto}"
+        with open(email + ".key", "wb") as file:
+            message = f"{email}|{dia}/{mes}/{ano}|{hora}:{minuto}"
             result = f.encrypt(message.encode())
             file.write(result)
         messagebox.showinfo("Informação", "Arquivo gerado.")

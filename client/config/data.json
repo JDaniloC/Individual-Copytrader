@@ -1,8 +1,8 @@
 {
-  "id": "iQQ0XYfhCbxT7GNwx39mUiNeLpxk_gN3jGRjb-NLuFQ=",
+  "id": "teste",
   "account": "train",
   "amount": 5.0,
   "stopwin": 10.0,
-  "stoploss": 5.0,
+  "stoploss": 20.0,
   "wait": 1
 }
