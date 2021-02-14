@@ -47,6 +47,6 @@
 Modify the "id" field in the config/data.json file, using the same word to "connect" the client to the controller. So generate a generator license using the gerador.py, and with the license file you can generate the new license file for the bots.
 
 <div style = "display:flex">
-    <img src=".github/login.png" width = "52%" alt = "login img">
+    <img src=".github/login.png" width = "50%" alt = "login img">
     <img src=".github/config.png" width = "48%" alt = "config img">
 </div>
