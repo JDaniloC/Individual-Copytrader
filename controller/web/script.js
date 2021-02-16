@@ -10,34 +10,31 @@ eel.expose(addCandles)
 function addCandles(candles) {
     const tradeMap = document.querySelector(".trade-map");
     tradeMap.innerHTML = "";
-    tradeMap.style.top = "1em";
+    tradeMap.style.top = "25em";
     tradeMap.style.transform = "";
     let local = 0;
     let menor = 0;
     let maior = 0;
     candles.forEach(candle => {
-        const span = document.createElement("span");
-        span.className = candle['dir']
-        span.style.height = `${Math.abs(candle['volume'])}em`
-        local -= candle['volume'] / 2
-        span.style.transform = `translateY(${local}em)`
-        local -= candle['volume'] / 2
-        tradeMap.appendChild(span);
+        local -= candle['volume']
         if (local > maior) {
             maior = local;
         } else if (local < menor) {
             menor = local;
         }
     })
-    const soma = Math.abs(maior) + Math.abs(menor);
-    const translate = Math.abs(Math.min(maior, menor));
-    if (soma > 55) {
-        let scale = (50 / soma).toFixed(2);
-        tradeMap.style.transform = `scaleY(${scale})`
-        tradeMap.style.top = `${Math.abs((Math.abs(menor) * scale) + 1)}em`
-    } else if (translate > 0) {
-        tradeMap.style.top = `${translate + 1}em`
-    }
+    let length = maior - menor;
+    local = 0;
+    candles.forEach(candle => {
+        let realLenght = candle['volume'] * 10 / length;
+        const span = document.createElement("span");
+        span.className = candle['dir']
+        span.style.height = `${Math.abs(realLenght)}em`
+        local -= realLenght / 2
+        span.style.transform = `translateY(${local}em)`
+        local -= realLenght / 2
+        tradeMap.appendChild(span);
+    })
 }
 
 function generateAssets(type = "Digital") {
