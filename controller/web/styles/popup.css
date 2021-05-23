@@ -28,12 +28,43 @@
 
 .overlay div img {
     width: 8em;
+    margin-right: 1em;
 }
 
 .overlay div p {
     font-size: 2em;
     color: #000;
     font-weight: bolder;
+}
+
+.listaContainer {
+    display: none;
+    top: 20vh;
+    opacity: 1;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: all;
+}
+.listaContainer div {
+    padding-right: 0;
+}
+.listaContainer button {
+    align-self: flex-start;
+    border: solid 0.1px;
+    background-color: transparent;
+    padding: .1em .5em;
+    cursor: pointer;
+}
+.listaContainer div + div button {
+    padding: 1em;
+}
+.listaContainer textarea {
+    width: 100%;
+    padding: 1em;
+    height: 20em;
+    min-width: 50%;
+    max-height: 50vh;
+    resize: vertical;
 }
 
 @keyframes showup {

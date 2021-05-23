@@ -2,7 +2,7 @@ main .trade {
     display: flex;
     flex-direction: column;
     margin-left: auto;
-    max-width: 10em;
+    max-width: 8em;
 }
 
 main .trade .chooser {
@@ -19,7 +19,7 @@ main .trade .chooser p {
 }
 
 main .trade button {
-    padding: 3em;
+    padding: 2em;
     margin: 4px;
     border: none;
     cursor: pointer;
@@ -30,7 +30,26 @@ main .trade button:hover {
 }
 
 main .trade button img {
-    width: 5em;
+    width: 4em;
+}
+
+.trade.list {
+    width: 10em;
+    max-width: 10em;
+    overflow-y: auto;
+    height: calc(100vh - 95px);
+}
+.trade.list span {
+    display: flex;
+    padding: 1em 0;
+}
+.trade.list span div {
+    display: flex;
+    flex-direction: column;
+}
+.trade.list span img {
+    height: 2.5em;
+    margin-right: 1em;
 }
 
 #call-btn {

@@ -14,6 +14,71 @@ try:
     from dontpad import Dontpad
     from os import listdir
 
+    def pegar_comando(texto):
+        def datetime_brazil():
+            return datetime.fromtimestamp(
+                datetime.utcnow().timestamp() - 10800)
+        def timestamp(data, hora):
+            return datetime(
+                data[2], data[1], data[0], hora[0], hora[1]
+            ).timestamp()
+        try:
+            data = re.search(r'\d{2}\W\d{2}\W\d{4}', texto)
+            if data:
+                data = [int(x) for x in re.split(r"\W", data[0])]
+            else:
+                hoje = datetime_brazil()
+                data = [hoje.day, hoje.month, hoje.year]
+            textHour = re.search(r'\d{2}:\d{2}', texto)[0]
+            hora = [int(x) for x in re.split(r'\W', textHour)]
+            par = re.search(r'[A-Za-z]{6}(-OTC)?', 
+                texto.upper().replace("/", ""))[0]
+            ordem = re.search(r'CALL|PUT', texto.upper())[0].lower()
+            timeframe = re.search(
+                r'[MH][1-6]?[0-5]', texto.upper())
+            if timeframe: 
+                if "M" in timeframe[0].upper(): 
+                    timeframe = int(timeframe[0].strip("M"))
+                else: 
+                    timeframe = int(timeframe[0].strip("H")) * 60
+            else: timeframe = 0
+        except Exception as e:
+            print(type(e), e)
+            return {}
+
+        return {
+            "textHour": textHour,
+            "data": data,
+            "hora": hora,
+            "par": par,
+            "ordem": ordem,
+            "timeframe": timeframe,
+            "timestamp": timestamp(data, hora)
+        }
+
+    def esperarAte(horas, minutos, data = (), tolerancia = 0):
+        if data == ():
+            data = datetime.now()
+        else:
+            data = datetime(*data[::-1])
+        alvo = datetime.fromtimestamp(
+            data.replace(
+                hour = horas, 
+                minute = minutos, 
+                second = 0, 
+                microsecond = 0
+            ).timestamp() - tolerancia)
+        agora = datetime.utcnow().timestamp() - 10800 # -3Horas
+        segundos = alvo.timestamp() - agora
+        if segundos > 10:
+            eel.createOrder("Esperando...", "", 
+                "Lista programada", segundos)
+            time.sleep(segundos)
+            return True
+        if segundos > (-10 - tolerancia):
+            return True
+        return False
+
     class IQOption:
         def __init__(self):
             self.API = None
@@ -31,6 +96,26 @@ try:
                 self.API.change_balance("PRACTICE")
                 return True
             return False
+
+        def seguir_lista(self, lista):
+            for index, comando in enumerate(lista):
+                data = comando["data"]
+                horas, minutos = comando["hora"]
+                tempo = (comando['timeframe'] 
+                    if comando['timeframe'] != 0 
+                    else self.timeframe // 60)
+
+                if esperarAte(horas, minutos, data, 2) and self.updating:
+                    par = comando['par']
+                    ordem = comando['ordem']
+                    threading.Thread(
+                        target=api.ordem, 
+                        args = (ordem, (par, tempo)),
+                        daemon = True
+                    ).start()
+                eel.selectItemList(index)
+                
+                if not self.updating: break
 
         def get_candles(self):
             candles = self.API.get_candles(
@@ -64,7 +149,7 @@ try:
 
             return result
         
-        def ordem(self, direcao):
+        def ordem(self, direcao, data = False):
             def enviar_sinal(par, direcao, tempo, tipo):
                 Dontpad.write("copytrader/" + self.url, 
                     json.dumps({"orders": [{
@@ -74,11 +159,16 @@ try:
                 ))
 
                 eel.animatePopUp("add.svg", "Ordem adicionada!")
-                eel.createOrder(par.upper(), direcao.upper(), tipo.capitalize(), tempo * 60)
+                eel.createOrder(par.upper(), direcao.upper(), 
+                    tipo.capitalize(), tempo * 60)
             
             direcao = direcao.lower()
-            par, valor = self.asset, self.amount
-            tipo, tempo = self.option, self.timeframe // 60
+            if data:
+                par, tempo = data
+            else:    
+                par = self.asset
+                tempo = self.timeframe // 60
+            valor, tipo = self.amount, self.option
             
             threading.Thread(target = enviar_sinal, 
                 args = (par, direcao, tempo, tipo)).start()
@@ -154,7 +244,27 @@ try:
     @eel.expose
     def operate(direcao):
         threading.Thread(
-            target=api.ordem, args=(direcao, ),
+            target=api.ordem, 
+            args = (direcao, False),
+            daemon = True
+        ).start()
+
+    @eel.expose
+    def verificar_lista(texto):
+        lista = []
+        for entrada in texto.split("\n"):
+            if entrada not in ['', '\n']:
+                comando = pegar_comando(entrada)
+                if comando != {}:
+                    lista.append(comando)
+        lista.sort(key = lambda x: x["timestamp"])
+        return lista
+
+    @eel.expose
+    def seguir_lista(lista):
+        threading.Thread(
+            target=api.seguir_lista, 
+            args = (lista, ),
             daemon = True
         ).start()
 
