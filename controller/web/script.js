@@ -375,7 +375,7 @@ function changeLicense(email, texto) {
     if (texto === "Renove sua licença") {
         document.querySelector(
             ".login button"
-        ).disabled = true;
+        ).disabled = false;
     }
     document.querySelector(
         "sub"

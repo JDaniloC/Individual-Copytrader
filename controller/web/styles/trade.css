@@ -3,6 +3,7 @@ main .trade {
     flex-direction: column;
     margin-left: auto;
     max-width: 8em;
+    background: rgb(28 29 31 / 50%);
 }
 
 main .trade .chooser {

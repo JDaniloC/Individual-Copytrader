@@ -9,6 +9,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-image: url("../images/worldmap.svg");
+    background-repeat: no-repeat;
+    height: 100vh;
+    background-size: cover;
+    position: relative;
+    overflow-x: hidden;
 }
 
 section.overlay {
