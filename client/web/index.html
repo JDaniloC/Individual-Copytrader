@@ -7,12 +7,18 @@
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/trades.css">
+    <link rel="stylesheet" href="styles/config.css">
+    <link rel="stylesheet" href="styles/bootstrap.css">
     
     <script type="text/javascript" src="/eel.js"></script>
-    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="./scripts/script.js"></script>
+    <script type="text/javascript" src="./scripts/settings.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.js"></script>
+    <script type="text/javascript" src="./scripts/bootstrap.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
 </head>
 <body>
     <section class="overlay">
@@ -22,7 +28,7 @@
             <h2> CopyTrader Login </h2>
             <input placeholder = "E-mail da IQ" type="email" required>
             <input placeholder = "Senha" type="password" required>
-            <div style = "display: flex">
+            <div>
                 <button type = "submit"> Entrar </button>
                 <button type = "button" onclick = 
                     "document.querySelector('#licensefile').click()"> 
@@ -35,66 +41,41 @@
             <sub> Renove sua licença </sub>
         </form>
     </section>
-    <section class="config">
-        <form onsubmit= "return false">
-            <h2> 
-                Configurações 
-                <button class = "close" onclick = "closeConfig()"> 
-                    x 
-                </button> 
-            </h2>
-            <div style = "display:flex; font-size: xx-small;">
-                <div>
-                    <input type="radio" id = "train" 
-                        name = "account" value = "train">
-                    <label for="train"> Treino </label>
-                </div>
-                <div>
-                    <input type="radio" id = "real" 
-                        name = "account" value = "real">
-                    <label for="real"> Real </label>
-                </div>
+    <div id = "container">
+        <section class="config">
+        </section>
+        <header>
+            <h1> CopyTrader </h1>
+            <img src="images/loading.svg" id="loading">
+            <div>
+                <h3> Status do servidor </h3>
+                <p class="offline"> Offline </p>
             </div>
-
-            <label for="amount"> Valor da entrada </label>
-            <input name = "amount" type = "number" min = 2 value = 2>
-            <label for="stopwin"> Stop Win </label>
-            <input name = "stopwin" type = "number" min = 2 value = 4>
-            <label for="stoploss"> Stop Loss </label>
-            <input name = "stoploss" type = "number" min = 2 value = 4>
-            <label for="wait"> Atualização </label>
-            <input name = "wait" type = "number" min = 1 value = 5>
-            <button onclick = "saveConfig()"> Salvar </button>
-        </form>
-    </section>
-    <header>
-        <h1> CopyTrader </h1>
-        <img src="images/loading.svg" id="loading">
-        <div>
-            <h3> Status do servidor </h3>
-            <p class="offline"> Offline </p>
-        </div>
-        <img src="images/gears.svg" alt="config img" 
-            id = "config-btn" onClick = "openConfig()">
-    </header>
-    <main>
-        <h2> Entradas feitas </h2>
-        <ul>
-        </ul>
-    </main>
-    <footer>
-        <div>
-            <h3> Ganho Total </h3>
-            <p> R$ 0,00 </p>
-        </div>
-        <div>
-            <h3> Stop Win </h3>
-            <p> R$ 10,00 </p>
-        </div>
-        <div>
-            <h3> Stop Loss </h3>
-            <p> R$ 10,00 </p>
-        </div>
-    </footer>
+            <img src="images/gears.svg" alt="config img" 
+                id = "config-btn" onClick = "openConfig()">
+        </header>
+        <main>
+            <h2> Entradas feitas </h2>
+            <ul>
+            </ul>
+        </main>
+        <footer>
+            <div>
+                <h3> Ganho Total </h3>
+                <p> R$ 0,00 </p>
+            </div>
+            <div>
+                <h3> Stop Win </h3>
+                <p> R$ 10,00 </p>
+            </div>
+            <div>
+                <h3> Stop Loss </h3>
+                <p> R$ 10,00 </p>
+            </div>
+        </footer>
+    </div>
 </body>
+<script>
+    $("section.config").load("components/config.html")
+</script>
 </html>

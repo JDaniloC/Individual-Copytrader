@@ -82,62 +82,11 @@ const assets = [
     {image: "https://static.cdnpub.info/files/storage/public/5b/50/820142ec6.svg", 
         title: "AUD/CAD"}
 ];
-function openConfig() {
-    document.querySelector(
-        "section.config"
-    ).style.display = "flex";
-    document.querySelector(
-        "section.overlay"
-    ).style.display = "flex";
-}
-function closeConfig() {
-    document.querySelector(
-        "section.config"
-    ).style.display = "none";
-    document.querySelector(
-        "section.overlay"
-    ).style.display = "none";
-}
-eel.expose(changeConfig)
-function changeConfig(config) {
-    document.querySelector(
-        `section.config input#${config["account"]}`
-    ).checked = true;
-    console.log(config["account"])
-    document.querySelector(
-        "section.config input[name=amount]"
-    ).value = config["amount"];
-    document.querySelector(
-        "section.config input[name=stopwin]"
-    ).value = config["stopwin"];
-    document.querySelector(
-        "section.config input[name=stoploss]"
-    ).value = config["stoploss"];
-    document.querySelector(
-        "section.config input[name=wait]"
-    ).value = config["wait"];
-    saveConfig();
-    document.querySelector(
-        "section.overlay"
-    ).style.display = "flex";
-}
-function saveConfig() {
-    const account = document.querySelector(
-        "section.config input[name=account]").checked;
-    const amount = document.querySelector(
-        "section.config input[name=amount]").value;
-    const stopwin = document.querySelector(
-        "section.config input[name=stopwin]").value;
-    const stoploss = document.querySelector(
-        "section.config input[name=stoploss]").value;
-    const wait = document.querySelector(
-        "section.config input[name=wait]").value;
-    eel.change_config(account, amount, stopwin, stoploss, wait);
-    closeConfig();
-}
+
 function getImage(asset) {
     for (var i = 0; i < assets.length; i++) {
-        if (assets[i].title === asset) {
+        const title = assets[i].title.replace("/", "").replace(" (OTC)", "-OTC");
+        if (title === asset) {
             return assets[i].image;
         }
     }
@@ -197,6 +146,7 @@ async function login(event) {
             "section.overlay"
         ).style.display = "none"; 
         if (result) {
+            loadConfig();
             const status = document.querySelector("header p");
             status.className = "online";
             status.textContent = "Online";

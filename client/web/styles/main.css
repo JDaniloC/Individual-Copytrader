@@ -7,14 +7,59 @@
 
 body {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
+
     background-image: url("../images/worldmap.svg");
     background-repeat: no-repeat;
-    height: 100vh;
     background-size: cover;
     position: relative;
     overflow-x: hidden;
+    height: 100vh;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+ul::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+    background-color: white;
+}
+ul::-webkit-scrollbar,
+div::-webkit-scrollbar {
+    width: 12px;
+    background-color: transparent;
+}
+ul::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+    border-radius: 10px;
+    background-color: var(--bs-secondary);
+}
+
+:root {
+    --bg-dark: #FFF;
+    --bg-deep: #19202D;
+    --bg-normal: #252d44;
+    --bg-light: #2A334A;
+    
+    --bt-dark: #000;
+    --bt-normal: #3F475E; 
+    --bt-light: #464C59;
+    --bt-lighter: #EEE;
+
+    --green-dark: #2a9139;
+    --green-light: #3dbd40;
+
+    --red-dark: #db4931;
+    --red-light: #e04d25;
 }
 
 section.overlay {
@@ -31,7 +76,7 @@ section {
     height: 100vh;
 }
 
-section form {
+section.login form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,8 +85,14 @@ section form {
     padding: 1em;
     background-color: #fff;
 }
+section.login form > div {
+    display: flex;
+    width: 100%;
+    font-size: 1.6em;
+    justify-content: space-between;
+}
 
-section form * {
+section.login form * {
     font-size: 2em;
     padding: 0.2em;
 }
@@ -54,7 +105,9 @@ section.login form button {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 200px
+    width: 200px;
+    border-radius: 4px;
+    border-style: double;
 }
 section.login div * {
     font-size: 1em;
@@ -64,16 +117,6 @@ section.login form button img#loading {
     height: 1em;
     width: 1em;
     margin: 0;
-}
-section.config {
-    display: none;
-}
-section.config input {
-    text-align: center;
-    margin-bottom: 0.4em;
-}
-section.config h2 {
-    width: 100%;
 }
 section button.close {
     width: 20px;
@@ -142,7 +185,7 @@ footer {
 
 section sub {
     width: 100%;
-    font-size: 10px;
+    font-size: 10px !important;
     margin-top: 0.5em;
     text-align: right;
 }

@@ -1,0 +1,297 @@
+<div id = "settings" 
+    style = "pointer-events: all;">
+    <span>
+        <h5> Configurações </h5>
+        <button type="button" class="btn-close" 
+        aria-label="Close" onclick="closeConfig()"></button>
+    </span>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#"
+            onclick = "showGeral()" id = "geral">
+                Configurações
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"
+            onclick = "showCiclosGales()" id = "gales">
+                Ciclos de gale
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#"
+            onclick = "showCiclosSoros()" id = "soros">
+                Ciclos de soros
+            </a>
+        </li>
+    </ul>
+    <span id = "settings-geral">
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tipo_conta" 
+                aria-label="Floating label select">
+                <option selected value="treino"> Treino </option>
+                <option value="real"> Real </option>
+            </select>
+            <label for="tipo_conta"> Tipo de conta </label>
+        </div>
+        <form class="form-floating">
+            <span class="input-group-text"> $ </span>
+            <input type="number" class="form-control" id="stopwin" 
+                value="1" min = "1" max = "20000">
+            <label for="stopwin"> Stop Win </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+        <form class="form-floating">
+            <span class="input-group-text"> $ </span>
+            <input type="number" class="form-control" id="stoploss" 
+                value="1" min = "1" max = "20000">
+            <label for="stoploss"> Stop Loss </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+        <form class="form-floating">
+            <span class="input-group-text"> $ </span>
+            <input type="number" class="form-control" id="valor" 
+                value="1" min = "1" max = "20000">
+            <label for="valor"> Entrada </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tipo_stop" 
+                aria-label="Floating label select">
+                <option selected value="fixo"> Fixo </option>
+                <option value="movel"> Móvel </option>
+            </select>
+            <label for="tipo_stop"> Tipo de stoploss </label>
+        </div>  
+
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tipo_gale" 
+                aria-label="Floating label select">
+                <option selected value="martingale"> 
+                    Martingale
+                </option>
+                <option value="sorosgale"> Sorosgale </option>
+                <option value="ciclos"> Ciclos </option>
+                <option value="nenhum"> Mão fixa </option>
+            </select>
+            <label for="tipo_gale"> Gerenciamento </label>
+        </div>
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="vez_gale" 
+                aria-label="Floating label select">
+                <option selected value="vela"> Vela </option>
+                <option value="entrada"> Entrada </option>
+            </select>
+            <label for="vez_gale"> Gale na próxima </label>
+        </div>
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tipo_martin" 
+                aria-label="Floating label select">
+                <option selected value="simples"> 
+                    Simples
+                </option>
+                <option value="seguro"> Seguro </option>
+                <option value="leve"> Leve </option>
+                <option value="agressivo"> Agressivo </option>
+            </select>
+            <label for="tipo_martin"> Tipo de martingale </label>
+        </div>
+
+        <form class="form-floating">
+            <input type="number" class="form-control" title="O que são níveis?" 
+                data-bs-toggle="popover" data-bs-content="Controla o máximo de gales 
+                (aumenta o valor) ou de sorosgales (níveis) de acordo com o gerenciamento."
+                id="max_gale" value="0" min = "0" max = "10">
+            <label for="max_gale" style = "white-space: nowrap;"> 
+                Máximo de gales/níveis
+            </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+
+
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tipo_soros" 
+                aria-label="Floating label select">
+                <option selected value="normal"> Normal </option>
+                <option value="ciclos"> Ciclos </option>
+            </select>
+            <label for="tipo_soros"> Tipo de soros </label>
+        </div>
+
+        <form class="form-floating">
+            <input type="number" class="form-control" id="max_soros" 
+                value="0" min = "0" max = "10">
+            <label for="max_soros"> Máximo de soros </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+        <form class="form-floating">
+            <input type="number" class="form-control" id="scalper_win" 
+                value="0" min = "0" max = "100">
+            <label for="scalper_win"> Scalper Win </label>
+            <span class="input-group-text"> % </span>
+        </form>
+        <form class="form-floating">
+            <input type="number" class="form-control" id="scalper_loss" 
+                value="0" min = "0" max = "100">
+            <label for="scalper_loss"> Scalper Loss </label>
+            <span class="input-group-text"> % </span>
+        </form>
+        <form class="form-floating" style = "flex: 1 1 35%;">
+            <span class="input-group-text align-items-center"> 
+                <input type="checkbox" 
+                    name="delaye" id="delaye"> 
+            </span>
+            <input type="number" class="form-control"   
+                id="delay" value="0" 
+                min = "-30" max = "30" data-bs-trigger="focus" 
+                data-bs-toggle="popover" 
+                title="Como funciona?" 
+                data-bs-content = "Segundos para pegar o resultado por taxa, 
+                funciona apenas se ativar o botão ao lado.">
+            <label for="delay"> Antecipar Resultado </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
+        <form class="form-floating">
+            <span class="input-group-text align-items-center"> 
+                <input type="checkbox" name="prestoploss" id="prestoploss"> 
+            </span>
+            <input type="number" class="form-control" id="prestopwin" value="0" min = "0" max = "90"
+            data-bs-trigger="focus" data-bs-toggle="popover" title="Pré-stops" 
+            data-bs-content="O pré stoploss (botão ativável) para as operações 
+            em caso de que a entrada ultrapasse o stoploss. No caso do stopwin 
+            você determina a porcentagem de tolerância.">
+            <span class="input-group-text"> % </span>
+            <label for="prestopwin"> Pré-Stops </label>
+        </form>
+    </span>
+    <span id="settings-ciclosgale">
+        <table class="table table-bordered table-responsive-x1">
+            <thead>
+              <tr>
+                <th scope="col">Ciclos\Mãos</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </span>
+    <span id="settings-ciclossoros">
+        <span style = "flex-direction: column; align-items: center;">
+            <table class="table table-bordered table-responsive-x1">
+                <thead>
+                  <tr>
+                    <th scope="col">Ciclo\Gale</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </span>
+    </span>
+    <button onclick = "saveChanges()">
+        Salvar configuração
+    </button>
+</div>
+<script>
+    $(function () {
+        $('.dropdown-toggle').dropdown();
+    }); 
+    function stepUp(button) {
+        button.parentNode.parentNode.querySelector(
+            'input[type=number]').stepUp()
+    }
+    function stepDown(button) {
+        button.parentNode.parentNode.querySelector(
+            'input[type=number]').stepDown()
+    }
+    function loadTable(settings) {  
+        const header = document.querySelector(
+            settings + "table thead tr");
+        for (let i = 0; i < 8; i++) {
+            let newNode = document.createElement("th");
+            if (i == 0) {
+                newNode.innerText = "Entrada";
+            } else {
+                newNode.innerText = `${i}° Gale`;
+            }
+            newNode.setAttribute("scope", "col")
+            header.appendChild(newNode);
+        }
+        
+        const body = document.querySelector(
+            settings + "table tbody");
+        for (let i = 1; i < 9; i++) {
+            let newTr = document.createElement("tr");
+            
+            let newNode = document.createElement("th");
+            newNode.innerText = `${i}° Ciclo`;
+            newNode.setAttribute("scope", "row")
+            newTr.appendChild(newNode);
+
+            for (let j = 1; j < 9; j++) { 
+                newTr.innerHTML += `
+                <td>
+                    <input type="number" class="form-control" placeholder="R$">
+                </td>
+                `
+            }
+
+            body.appendChild(newTr);
+        }
+    }
+    var popoverTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(
+        function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'focus'
+        })
+    })
+
+    loadTable("#settings-ciclosgale ");
+    loadTable("#settings-ciclossoros ");
+    closeConfig(true);
+</script>

@@ -1,0 +1,171 @@
+div#settings {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    width: auto;
+    height: max-content;
+    border-radius: 4px;
+    max-width: 40em;
+    padding: 1em;
+    
+    color: var(--bt-normal);
+    background-color: var(--bg-dark);
+}
+div#settings form {
+    flex-direction: row;
+    align-items: inherit;
+    justify-content: initial;
+    padding: 0;
+    background-color: var(--bg-dark);
+}
+div#settings ul {
+    width: 100%;
+}
+div#settings a.nav-link {
+    color: var(--bt-normal);
+}
+div#settings a.nav-link.active {
+    color: var(--bt-dark);
+}
+div#settings > span {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background-color: var(--bg-dark);
+}
+div#settings > span:first-child {
+    padding-bottom: 1em;
+    width: 100%;
+}
+div#settings span > * {
+    margin: 0.2em;
+}
+div#settings .form-floating {
+    flex: 1 1 30%;
+}
+div#settings .form-floating > label {
+    color: var(--bt-dark);
+}
+div#settings input, div#settings select, aside#commands select{
+    background-color: var(--bg-dark);
+    border: 1px solid #6c757d;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+div#settings select, aside#commands select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    cursor: pointer;
+    color: var(--bt-light);
+}
+div#settings select:hover {
+    background-color: var(--bt-lighter);
+}
+div#settings select option, aside#commands select option {
+    background-color: var(--bg-dark);
+}
+div#settings form.form-floating {
+    display: flex;
+    color: var(--bt-dark);
+}
+
+div#settings .input-group-text {
+    width: 2em !important;
+    align-items: flex-end;
+    justify-content: center;
+    border: 1px solid #6c757d;
+    background-color: var(--bg-dark);
+}
+div#settings span.input-group-text + input + label {
+    left: 2em;
+}
+
+div#settings input[type=number] {
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+div#settings > button {
+    background-color: var(--bg-dark);
+    border: 1px solid #6c757d;
+    border-radius: 4px;
+    margin-top: 1em;
+    padding: 1em;
+}
+div#settings > button:hover {
+    background: var(--bt-lighter);
+}
+
+div#settings #settings-filter {
+    display: none;
+}
+div#settings input#noticias_hora {
+    border-right: 1px solid #6c757d;
+}
+div#settings input#noticias_minuto {
+    border-radius: 0px 4px 4px 0;
+    border-right: 1px solid #6c757d;
+}
+div#settings label[for=prestopwin] {
+    transform: scale(0.85) translateY(-0.5rem) translateX(2rem);
+}
+div#settings #settings-ciclosgale {
+    display: none;
+}
+div#settings #settings-ciclossoros {
+    display: none;
+}
+div#settings table {
+    font-size: .7em;
+    text-align: center;
+}
+div#settings table td {
+    padding: 0;
+}
+div#settings table td input[type=number] {
+    margin: 0;
+    border-radius: 4px;
+    border-right: 1px solid #6c757d;
+    height: 3em;
+    padding: .5em;
+}
+.align-items-center {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+.input-stepper {
+    border: 1px solid #6c757d;
+    border-radius: 0px 4px 4px 0;
+    border-left: none;
+    width: 2em;
+    padding-right: 1em;
+}
+.input-stepper button {
+    outline:none;
+    background-color: transparent;
+    border: none;
+    width: 1rem;
+    height: .5rem;
+    cursor: pointer;
+}
+.input-stepper button:after {
+    display: inline-block;
+    position: absolute;
+    font-family: "Font Awesome 5 Free"; 
+    font-weight: 900;
+    content: '\f077';
+    transform: translate(-50%, -50%) rotate(180deg);
+}
+.input-stepper button.plus:after {
+    transform: translate(-50%, -50%) rotate(0deg);
+}
