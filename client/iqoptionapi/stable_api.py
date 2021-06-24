@@ -178,8 +178,8 @@ class IQ_Option:
 
         start = time.time()
         while self.api.leaderboard_deals_client == None:
-            if time.time() - start > 40:
-                return None
+            if time.time() - start > 30:
+                return []
         return self.api.leaderboard_deals_client
 
     def get_instruments(self, type):
@@ -1549,13 +1549,14 @@ class IQ_Option:
         self.api.leaderboard_userinfo_deals_client = None
 
         while True:
+            self.api.Request_Leaderboard_Userinfo_Deals_Client(
+                user_id, country_id)
             try:
                 if self.api.leaderboard_userinfo_deals_client["isSuccessful"] == True:
                     break
+                else: print(self.api.leaderboard_userinfo_deals_client)
             except:
                 pass
-            self.api.Request_Leaderboard_Userinfo_Deals_Client(
-                user_id, country_id)
             time.sleep(0.2)
 
         return self.api.leaderboard_userinfo_deals_client

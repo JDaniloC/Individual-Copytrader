@@ -55,9 +55,12 @@
                 id = "config-btn" onClick = "openConfig()">
         </header>
         <main>
-            <h2> Entradas feitas </h2>
-            <ul>
-            </ul>
+            <div class="trades">
+                <ul></ul>
+            </div>
+            <div class="logs">
+                <ul></ul>
+            </div>            
         </main>
         <footer>
             <div>
@@ -76,6 +79,9 @@
     </div>
 </body>
 <script>
-    $("section.config").load("components/config.html")
+    $("section.config").load("components/config.html");
+    // login({
+    //     preventDefault: () => {}
+    // });
 </script>
 </html>

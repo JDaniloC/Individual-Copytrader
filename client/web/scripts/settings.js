@@ -116,8 +116,6 @@ function saveChanges(config = null) {
 
         config.valor = parseFloat(getValue(
             "#valor", config.valor))
-        config.tipo_par = getValue(
-            "#tipo_par", config.tipo_par)
         
         config.vez_gale = getValue(
             "#vez_gale", config.vez_gale)
@@ -179,14 +177,12 @@ function saveChanges(config = null) {
 eel.expose(loadConfig)
 function loadConfig() {
     function setValue(value, query) {
-        console.log(value, query);
         document.querySelector(query).value = value;
     }
     let config = JSON.parse(localStorage.getItem('config'));
     if (config == null) {
         return
     }
-    console.log(config)
     setValue(config.valor, "#valor")
     setValue(config.stoploss, "#settings #stoploss")
     setValue(config.stopwin, "#settings #stopwin")
@@ -201,7 +197,6 @@ function loadConfig() {
     setValue(config.max_soros, "#max_soros")
     setValue(config.max_gale, "#max_gale")
     setValue(config.vez_gale, "#vez_gale")
-    setValue(config.tipo_par, "#tipo_par")
 
     if (config['delay'] != false) {
         document.querySelector("#delaye").checked = true;
@@ -212,4 +207,16 @@ function loadConfig() {
     setCiclos("#settings-ciclosgale ", config.ciclos_gale) 
     setCiclos("#settings-ciclossoros ", config.ciclos_soros) 
     return config
+}
+eel.expose(addLog)
+function addLog(date, hour, message) {
+    let logs = document.querySelector("div.logs ul");
+    let newLog = document.createElement("li");
+    newLog.innerHTML = `
+    <div>
+        <p> ${date} </p> <p> ${hour} </p>
+    </div> <p> ${message} </p>`
+    logs.appendChild(newLog);
+
+    logs.scrollBy(0, 200);
 }

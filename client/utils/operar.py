@@ -1,4 +1,5 @@
 import threading, time, amanobot
+from datetime import datetime
 from utils.IQ import IQ_API
 from pprint import pprint
 
@@ -7,6 +8,7 @@ class Operacao(IQ_API):
         self.cadeado = threading.Lock()
         self.config = config
         self.entrou = False
+        self.output = lambda *x: print(x)
         self.operacoes_ativas = {}	
         self.chat_id = config["chat_id"]
         self.bottoken = config["token"]
@@ -75,9 +77,7 @@ class Operacao(IQ_API):
             "loss": self.config['scalper_loss']
         } if (self.config['scalper_win'] != 0 and 
             self.config['scalper_loss'] != 0) else False
-
-        pprint(self.config)
-        
+                
     def resetar_status(self):
         self.saldo_inicial = self.API.get_balance()
         self.valor = self.config["valor"]
@@ -107,7 +107,10 @@ class Operacao(IQ_API):
                 except Exception as e:
                     print("mostrar_mensagem()", type(e), e)
 
-        print(mensagem)
+        today = datetime.now()
+        self.output(today.strftime("%d/%m/%Y"), 
+            today.strftime("%H:%M"), 
+            mensagem.strip().replace("\n", "<br>"))
         if logs: return
 
         if self.bottoken != "" and self.chat_id != "":

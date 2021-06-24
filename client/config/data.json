@@ -1,8 +1,4 @@
 {
   "id": "teste",
-  "account": "train",
-  "amount": 5.0,
-  "stopwin": 10.0,
-  "stoploss": 20.0,
   "wait": 1
 }

@@ -36,6 +36,26 @@ class IQ_API:
                 time.sleep(1)
         return False
 
+    def online_top_ranking(self, quantidade, filtro = "Worldwide"):
+        '''
+        Procura o primeiro dos X traders online.
+        '''
+
+        ranking = []
+        contador = 0
+        while contador < 2 and ranking == []:
+            ranking = self.API.get_leader_board(filtro, 1, quantidade, 0)
+            contador += 1
+
+        if ranking == []: return []
+        else:
+            for _trader in ranking['result']['positional']:
+                trader = ranking['result']['positional'][_trader]
+                info = self.API.get_users_availability(trader['user_id'])
+                if info["statuses"][0]["status"] == "online":            
+                    return f"[{trader['flag']}] {trader['user_name']}"
+        return []
+
     def mudar_treino(self):
         '''
         Muda para a conta treino
