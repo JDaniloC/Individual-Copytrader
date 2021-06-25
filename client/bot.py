@@ -49,6 +49,7 @@ class IQOption:
         try:
             eel.loadConfig()(set_config)
             self.API = Operacao(config)
+            self.API.output = addLog
             return True
         except Exception as e:
             print(type(e), e)
@@ -92,6 +93,8 @@ class IQOption:
 
 api = IQOption()
 eel.init('web')
+
+def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 
 @eel.expose
 def verify_connection(email, password):

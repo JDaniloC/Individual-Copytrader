@@ -1,24 +1,52 @@
 main ul {
     display: flex;
     flex-wrap: wrap;
-    width: 90%;
-    max-height: 80vh;
+    max-height: calc(100vh - 260px);
     overflow: auto;
+    width: 90%;
+    overflow-x: clip;
 }
 
 main ul li {
     display: flex;
-    align-items: center;
     justify-content: flex-start;
-    flex: 1 1 15%;
     padding: 1em;
     margin: 0.5em;
-    background-color: #25272b;
     color: #fff;
     border-radius: 3px;
     list-style: none;
 }
 
+main > div.trades {
+    flex-grow: 1;
+}
+main div.trades li {
+    background-color: #25272b;
+    align-items: center;
+    flex: 1 1 15%;
+    font-size: unset;
+}
+
 main ul li > * {
     margin: 0.5em;
+}
+main div.logs {
+    max-width: 50vw;
+    width: 100%;
+    height: calc(100vh - 260px);
+}
+main div.logs li,
+main div.logs {
+    padding: 0;
+}
+main div.logs ul {
+    flex-direction: column;
+    background-color: #25272b;
+    border-radius: 0 6px 6px 0;
+    flex-wrap: nowrap;
+    padding: 0.5em;
+    height: 100%;
+}
+main div.logs li p {
+    margin-bottom: 0;
 }
