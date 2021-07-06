@@ -1,6 +1,6 @@
 from iqoptionapi.stable_api import IQ_Option
 from datetime import datetime
-import time
+import time, random
 
 class IQ_API:
     def __init__(self, login, senha):
@@ -9,6 +9,7 @@ class IQ_API:
         '''
         self.asset, self.timeframe, self.payout_cache = False, False, {}
         self.API = IQ_Option(login, senha)
+        self.last_user_id = 0
         if not self.conectar():
             raise ConnectionError(" ❌ Não conseguiu se conectar, reveja a senha ❌ ")
 
@@ -36,7 +37,7 @@ class IQ_API:
                 time.sleep(1)
         return False
 
-    def online_top_ranking(self, quantidade, filtro = "Worldwide"):
+    def online_top_ranking(self, inicio = 1, final = 100, filtro = "Worldwide"):
         '''
         Procura o primeiro dos X traders online.
         '''
@@ -44,17 +45,34 @@ class IQ_API:
         ranking = []
         contador = 0
         while contador < 2 and ranking == []:
-            ranking = self.API.get_leader_board(filtro, 1, quantidade, 0)
+            ranking = self.API.get_leader_board(filtro, inicio, final, 0)
             contador += 1
 
-        if ranking == []: return []
+        if ranking == []: return [], ""
         else:
-            for _trader in ranking['result']['positional']:
-                trader = ranking['result']['positional'][_trader]
-                info = self.API.get_users_availability(trader['user_id'])
-                if info["statuses"][0]["status"] == "online":            
-                    return f"[{trader['flag']}] {trader['user_name']}"
-        return []
+            for position in ranking['result']['positional']:
+                trader = ranking['result']['positional'][position]
+                user_id = trader['user_id']
+                if user_id == self.last_user_id: continue
+                info = self.API.get_users_availability(user_id)
+                
+                if info["statuses"][0]["status"] == "online":    
+                    self.last_user_id = user_id
+
+                    ativos = self.API.get_all_ACTIVES_OPCODE()
+                    key_list = list(ativos.keys())
+                    value_list = list(ativos.values())
+                    asset_id = info["statuses"][0]["selected_asset_id"]
+                    while not (1 <= asset_id <= 8 or (
+                            76 <= asset_id <= 86
+                        ) or 99 <= asset_id <= 108):
+                        asset_id = (asset_id + random.randint(1, 100)) % len(value_list)
+                    paridade = key_list[value_list.index(asset_id)]
+                    return f"[{trader['flag']}] {position}° {trader['user_name']}", paridade
+        return [], ""
+
+    def format_dir(self, text):
+        return text.replace("CALL", "⬆️").replace("PUT", "⬇️")
 
     def mudar_treino(self):
         '''
@@ -119,11 +137,12 @@ class IQ_API:
                     return True
             return False
         
-        if is_in_list(mensagem, ["is not available", "active_suspended"]):
+        if is_in_list(mensagem, ["is not available", "active_suspended", "active_closed"]):
             mensagem = "Ativo fechado nesta modalidade/timeframe."
         elif "invalid instrument" in mensagem:
             mensagem = "Paridade não encontrada na digital pela IQ." 
-        self.mostrar_mensagem("❌ Não consegui operar: \n" + mensagem)
+        else: "A IQ não permitiu!"
+        self.mostrar_mensagem("❌ " + mensagem)
 
     def ordem(self, paridade, direcao = "call", tempo = 1, 
         valor = 1, tipo = "binary", bloqueador = None, 
@@ -180,8 +199,6 @@ class IQ_API:
             if not trying:
                 if self.tipo != "auto": 
                     self.tipo = "binary" if self.tipo == "digital" else "digital"
-                self.mostrar_mensagem("❌ Erro na operação, tentando operar na " + 
-                    ("binária" if tipo == "digital" else "digital"))
                 tipo = "binary" if tipo == "digital" else "digital"
                 
                 opcoes_modalidade = self.payout_cache.get(paridade.upper())

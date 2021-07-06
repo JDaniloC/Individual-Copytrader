@@ -346,7 +346,7 @@ class IQ_Option:
 
     # ______________________________________self.api.getprofile() https________________________________
 
-    def get_profile_ansyc(self):
+    def get_profile_async(self):
         while self.api.profile.msg == None:
             pass
         return self.api.profile.msg
@@ -402,7 +402,7 @@ class IQ_Option:
 
     def get_balance_mode(self):
         # self.api.profile.balance_type=None
-        profile = self.get_profile_ansyc()
+        profile = self.get_profile_async()
         for balance in profile.get("balances"):
             if balance["id"] == global_value.balance_id:
                 if balance["type"] == 1:
@@ -448,7 +448,7 @@ class IQ_Option:
         practice_id = None
         tournament_id = None
 
-        for balance in self.get_profile_ansyc()["balances"]:
+        for balance in self.get_profile_async()["balances"]:
             if balance["type"] == 1:
                 real_id = balance["id"]
             if balance["type"] == 4:

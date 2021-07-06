@@ -297,7 +297,7 @@ try:
 
     def procurar_licenca(filetext = ""):
         f = Fernet(b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50=')
-        dia, mes, ano = 17, 2, 2021
+        dia, mes, ano = 1, 7, 2021
         email, hora, minuto = "", 0, 0
 
         def decrypt(text):

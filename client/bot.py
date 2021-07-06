@@ -3,6 +3,7 @@ import eel, time, json, threading
 
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
+from random import randint, choice
 from dontpad import Dontpad
 from os import listdir
 
@@ -10,9 +11,16 @@ class IQOption:
     def __init__(self):
         self.API = None
         self.id = 0
-        self.wait = 3
+        self.wait = 1
         self.url = ""
+        self.inicio = 1
+        self.final = 100
+        self.timeframe = 1
+        self.premium = True
+        self.reverso = False
         self.account = "train"
+        self.adm_list = False
+        self.toptraders = False
 
     def change_balance(self, balance):
         if self.API != None:
@@ -26,19 +34,19 @@ class IQOption:
     def login(self, email, password):
         config = {
             "scalper_loss": 0,
-            "tipo_stop": "fixo", 
-            "tipo_soros": "normal", 
-            "tipo_conta": "treino",
             "tipo_gale": "martingale",
-            "chat_id": "", "token": "",
             "tipo_martin": "agressivo",
             "minimo": 0, "delay": False,
             "scalper_win": 0, "valor": 2, 
             "stoploss": 10, "max_gale": 2,
+            "timeframe": 1, "reverso": False,
             "stopwin": 10, "ciclos_gale": [],
             "email": email, "senha": password,
             "max_soros": 0, "ciclos_soros": [], 
+            "tipo_conta": "treino", "token": "",
+            "tipo_soros": "normal", "chat_id": "", 
             "prestopwin": 0, "prestoploss": False,
+            "topranking": 100, "tipo_stop": "fixo", 
             "tipo_par": "auto", "vez_gale": "vela",
         }
         def set_config(_config): 
@@ -48,8 +56,7 @@ class IQOption:
         
         try:
             eel.loadConfig()(set_config)
-            self.API = Operacao(config)
-            self.API.output = addLog
+            self.API = Operacao(config, addLog)
             return True
         except Exception as e:
             print(type(e), e)
@@ -63,32 +70,59 @@ class IQOption:
         resultado = self.API.realizar_trade(self.API.valor, 
             par, direcao, tempo, 0.7, tipo)
 
-        eel.setResult(id, resultado.upper())
-        eel.updateInfos(self.API.ganho_total, 
-            self.API.stopwin, self.API.stoploss)
+        if resultado.upper() != "ERROR":
+            eel.setResult(id, resultado.upper())
+            eel.updateInfos(self.API.ganho_total, 
+                self.API.stopwin, self.API.stoploss)
 
         return resultado
 
     def auto_trade(self):
         ultimo = ()
+        ultimo_top = 0
         while (self.API.ganho_total < self.API.stopwin and 
             self.API.ganho_total > -self.API.stoploss):
-            response = json.loads(
-                Dontpad.read("copytrader/" + self.url))
-            try:
-                for trade in response['orders']:
-                    timestamp = trade['timestamp']
-                    if time.time() - timestamp < self.wait + 2:
-                        par, tipo = trade['asset'], trade['type']
-                        direcao = trade['order']
-                        tempo = trade['timeframe']
-                        if (par, timestamp) != ultimo:
-                            ultimo = (par, timestamp)
-                            threading.Thread(
-                                target = self.ordem, daemon = True,
-                                args=(par, tipo, direcao, tempo)).start()
-            except: pass
-            time.sleep(self.wait)
+
+            if self.adm_list:
+                time.sleep(self.wait)
+            else:
+                time.sleep(randint(0, 300))
+
+            if self.toptraders and time.time() > ultimo_top:
+                if self.adm_list and self.toptraders:
+                    ultimo_top = time.time() + randint(0, 300)
+                
+                try:
+                    trader, par = self.API.online_top_ranking(self.inicio, self.final)
+                    if trader:
+                        direcao = "CALL" if randint(0, 1) else "PUT"
+                        if self.reverso:
+                            direcao = "CALL" if direcao == "PUT" else "PUT"
+                        threading.Thread(
+                            target = self.ordem, daemon = True,
+                            args=(par, "digital", direcao, self.timeframe)).start()
+                        today = datetime.now()
+                        addLog(today.strftime("%d/%m/%Y"), 
+                            today.strftime("%H:%M"), 
+                            f"{trader} <br>{par} M{self.timeframe}<br>Direção: {direcao}")
+                except Exception as e: print(type(e), e)
+            
+            if self.adm_list:
+                response = json.loads(
+                    Dontpad.read("copytrader/" + self.url))
+                try:
+                    for trade in response['orders']:
+                        timestamp = trade['timestamp']
+                        if time.time() - timestamp < self.wait + 2:
+                            par, tipo = trade['asset'], trade['type']
+                            direcao = trade['order']
+                            tempo = trade['timeframe']
+                            if (par, timestamp) != ultimo:
+                                ultimo = (par, timestamp)
+                                threading.Thread(
+                                    target = self.ordem, daemon = True,
+                                    args=(par, tipo, direcao, tempo)).start()
+                except: pass
         eel.changeStatus()
 
 api = IQOption()
@@ -96,6 +130,25 @@ eel.init('web')
 
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 
+@eel.expose
+def change_operation(_type): 
+    if api.premium: 
+        today = datetime.now()
+        if _type == "both":
+            api.adm_list = True
+            api.toptraders = True
+            mensagem = "🔰 Operando no top ranking e ADM."
+        elif _type == "top":
+            api.toptraders = True
+            api.adm_list = False
+            mensagem = "🔰 Buscando do top ranking."
+        else:
+            api.toptraders = False
+            api.adm_list = True
+            mensagem = "🔰 Esperando entradas do ADM."
+        addLog(today.strftime("%d/%m/%Y"), 
+            today.strftime("%H:%M"), 
+            mensagem)
 @eel.expose
 def verify_connection(email, password):
     if not api.login(email, password):
@@ -110,7 +163,6 @@ def verify_connection(email, password):
 def save_config():
     dic = {
         "id": api.url,
-        "wait": api.wait,
     }
     with open("config/data.json", "w") as file:
         json.dump(dic, file, indent = 2)
@@ -118,7 +170,9 @@ def save_config():
 @eel.expose
 def change_config(config):
     api.API.salvar_variaveis(config)
-    api.wait = config["wait"]
+    api.timeframe = int(config.get("timeframe", 1))
+    api.reverso = bool(config.get("reverso", False))
+    api.final = int(config.get("topranking", 100))
     save_config()
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
@@ -151,20 +205,20 @@ def devolve_restante(tempo_restante):
     return mensagem
 
 def procurar_licenca(filetext = ""):
-    f = Fernet(b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50=')
-    dia, mes, ano = 17, 2, 2021
+    f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
+    dia, mes, ano, ranking = 30, 6, 2021, True
     email, hora, minuto = "", 0, 0
 
     def decrypt(text):
         message = f.decrypt(text).decode()
-        email, data, horario = message.split("|")
+        email, data, horario, ranking = message.split("|")
         dia, mes, ano = list(map(int, data.split("/")))
         hora, minuto = list(map(int, horario.split(":")))
-        return email, dia, mes, ano, hora, minuto
+        return email, dia, mes, ano, hora, minuto, ranking == "True"
 
     if filetext != "":
         try:
-            email, dia, mes, ano, hora, minuto = decrypt(
+            email, dia, mes, ano, hora, minuto, ranking = decrypt(
                 filetext.encode("utf-8"))
         except Exception as e: print(type(e), e); filetext = ""
     else:
@@ -172,26 +226,26 @@ def procurar_licenca(filetext = ""):
             files = listdir(".")
             indice = list(map(lambda x:".key" in x, files)).index(True)
             with open(f"{files[indice]}", "rb") as file:
-                email, dia, mes, ano, hora, minuto = decrypt(file.readline())
+                email, dia, mes, ano, hora, minuto, ranking = decrypt(file.readline())
         except:
             try:
                 with open("license.key", "rb") as file:
                     message = f.decrypt(file.readline()).decode()
                     dia, mes, ano = list(map(int, message.split("/")))
             except Exception as e: 
-                print(e)
-    
+                print(type(e), e)
     data_final = datetime(ano, mes, dia, hora, minuto)
     tempo_restante = datetime.timestamp(data_final
         ) - datetime.timestamp(datetime.now())
 
+    api.premium = ranking
     mensagem = devolve_restante(tempo_restante)
-    return mensagem, email, filetext
+    return mensagem, email, ranking, filetext
 
 @eel.expose
 def search_license(text):
-    mensagem, email, filetext = procurar_licenca(text)
-    eel.changeLicense(email, mensagem)
+    mensagem, email, ranking, filetext = procurar_licenca(text)
+    eel.changeLicense(email, mensagem, ranking)
     if filetext != "":
         with open("license.key", "wb") as file:
             file.write(filetext.encode("utf-8"))
@@ -201,5 +255,5 @@ with open("config/data.json") as file:
     resultado = json.load(file)
     api.url = resultado['id']
 
-mensagem, email, caminho = procurar_licenca()
-eel.changeLicense(email, mensagem)
+mensagem, email, ranking, caminho = procurar_licenca()
+eel.changeLicense(email, mensagem, ranking)

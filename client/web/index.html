@@ -45,20 +45,51 @@
         <section class="config">
         </section>
         <header>
-            <h1> CopyTrader </h1>
-            <img src="images/loading.svg" id="loading">
-            <div>
-                <h3> Status do servidor </h3>
-                <p class="offline"> Offline </p>
+            <h1>CopyTrader</h1>
+            <span class="form-check form-switch">
+                <div>
+                    <input class="form-check-input" 
+                        onchange = "eel.change_operation('adm')"
+                        type="radio" id = "changeTop" 
+                        name = "tradetype" checked>
+                    <p> ADM </p>
+                </div>
+                <div>
+                    <input class="form-check-input" 
+                        onchange = "eel.change_operation('top')"
+                        type="radio" id = "changeTop" 
+                        name = "tradetype">
+                    <p> Top Traders </p>
+                </div>
+                <div>
+                    <input class="form-check-input" 
+                        onchange = "eel.change_operation('both')"
+                        type="radio" id = "changeTop" 
+                        name = "tradetype">
+                    <p> Ambos </p>
+                </div>
+            </span>
+            <div style="display: flex;" id = "status">
+                <img src="images/loading.svg" id="loading" 
+                    style="opacity: 0;">
+                <div>
+                    <h3> Status do servidor </h3>
+                    <p class="online">Online</p>
+                </div>
             </div>
-            <img src="images/gears.svg" alt="config img" 
-                id = "config-btn" onClick = "openConfig()">
+            <div style="font-size: x-large;">
+                Config
+                <img src="images/gears.svg" alt="config img" 
+                    id="config-btn" onclick="openConfig()">
+            </div>
         </header>
         <main>
             <div class="trades">
+                <h2> Entradas feitas </h2>
                 <ul></ul>
             </div>
             <div class="logs">
+                <h2> Relatório </h2>
                 <ul></ul>
             </div>            
         </main>
@@ -80,8 +111,5 @@
 </body>
 <script>
     $("section.config").load("components/config.html");
-    // login({
-    //     preventDefault: () => {}
-    // });
 </script>
 </html>

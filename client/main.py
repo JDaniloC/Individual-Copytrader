@@ -7,6 +7,6 @@ def escreve_erros(erro):
 
 try:
     from bot import *
-    eel.start('index.html')
+    eel.start('index.html', port = 8015)
 except Exception as e:
     escreve_erros(e)

@@ -117,6 +117,8 @@ function saveChanges(config = null) {
         config.valor = parseFloat(getValue(
             "#valor", config.valor))
         
+        config.reverso = getValue(
+            "#reverso", config.reverso)
         config.vez_gale = getValue(
             "#vez_gale", config.vez_gale)
         config.tipo_stop = getValue(
@@ -127,13 +129,15 @@ function saveChanges(config = null) {
             "#tipo_conta", config.tipo_conta)
         config.tipo_soros = getValue(
             "#tipo_soros", config.tipo_soros)
+        config.topranking = getValue(
+            "#topranking", config.topranking)
         
-        config.wait = parseInt(getValue(
-            "#wait", config.wait))
         config.delay = parseInt(getValue(
             "#delay", config.delay))
         config.max_gale = parseInt(getValue(
             "#max_gale", config.max_gale))
+        config.timeframe = parseInt(getValue(
+            "#timeframe", config.timeframe))
         config.max_soros = parseInt(getValue(
             "#max_soros", config.max_soros))
         config.prestopwin = parseInt(getValue(
@@ -197,6 +201,10 @@ function loadConfig() {
     setValue(config.max_soros, "#max_soros")
     setValue(config.max_gale, "#max_gale")
     setValue(config.vez_gale, "#vez_gale")
+    
+    setValue(config.reverso, "#reverso")
+    setValue(config.timeframe, "#timeframe")
+    setValue(config.topranking, "#topranking")
 
     if (config['delay'] != false) {
         document.querySelector("#delaye").checked = true;

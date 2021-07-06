@@ -206,7 +206,41 @@
             <span class="input-group-text"> % </span>
             <label for="prestopwin"> Pré-Stops </label>
         </form>
+
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="timeframe" 
+                aria-label="Floating label select">
+                <option selected value="1"> M1 </option>
+                <option value="5"> M5 </option>
+                <option value="15"> M15 </option>
+                <option value="30"> M30 </option>
+                <option value="60"> H1 </option>
+            </select>
+            <label for="timeframe"> Timeframe </label>
+        </div>
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="reverso" 
+                aria-label="Floating label select">
+                <option value="True"> Sim </option>
+                <option selected value="False"> Não </option>
+            </select>
+            <label for="reverso"> Trader reverso </label>
+        </div>
+        <form class="form-floating">
+            <input type="number" class="form-control" id="topranking" 
+                value="100" min = "1">
+            <label for="topranking"> Top ranking </label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
     </span>
+
     <span id="settings-ciclosgale">
         <table class="table table-bordered table-responsive-x1">
             <thead>

@@ -5,7 +5,7 @@ from os import path, environ
 import json
 
 ADMINKEY = b'mQsZgZwr59aCrmk6yY5vPkig1jSEybEv7wu0p6FQPsg='
-USERKEY = b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50='
+USERKEY = b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A='
 
 class Gerador(Frame):
     def __init__(self, janela, timestamp, atual, total):
@@ -78,7 +78,15 @@ class Gerador(Frame):
         for indice, nome in enumerate(self.titulos):
             Label(self, text = nome).grid(row = indice)
             Entry(self, textvariable = self.titulos[nome]).grid(row = indice, column = 1)
+        self.titulos["ranking"] = BooleanVar()
+        Checkbutton(self, text = "Top ranking", 
+            variable = self.titulos["ranking"],
+            onvalue = True, offvalue = False,
+            ).grid(row = len(self.titulos), columnspan = 2)
+
         botao = Button(self, text = "Gerar licença", command = self.gerar)
+
+
         if self.atual >= self.total or self.pirateado:
             botao.config(state = DISABLED)
         botao.grid(row = 10, columnspan = 2)
@@ -89,24 +97,25 @@ class Gerador(Frame):
         '''
         if self.atual < self.total:
             email = self.titulos['email'].get()
+            ranking = self.titulos['ranking'].get()
             dia = str(self.titulos['dia'].get())
             mes = str(self.titulos['mês'].get())
             ano = self.titulos['ano'].get()
             hora = self.titulos['hora'].get()
             minuto = self.titulos['minuto'].get()
-            self.criar_licenca(email, dia, mes, ano, hora, minuto)
+            self.criar_licenca(email, ranking, dia, mes, ano, hora, minuto)
         else:
             messagebox.showwarning("Licença", 
         "Você atingiu o máximo de linceças geradas. Compre mais licenças.")
 
-    def criar_licenca(self, email, dia, mes, ano, hora, minuto): 
+    def criar_licenca(self, email, ranking, dia, mes, ano, hora, minuto): 
         '''
         Criptografa uma mensagem com todos os dados (email e data)
         E escreve em um arquivo.
         '''
         f = Fernet(USERKEY)
         with open(email + ".key", "wb") as file:
-            message = f"{email}|{dia}/{mes}/{ano}|{hora}:{minuto}"
+            message = f"{email}|{dia}/{mes}/{ano}|{hora}:{minuto}|{ranking}"
             result = f.encrypt(message.encode())
             file.write(result)
         messagebox.showinfo("Informação", "Arquivo gerado.")
