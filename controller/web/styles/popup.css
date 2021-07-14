@@ -45,8 +45,8 @@
     align-items: center;
     pointer-events: all;
 }
-.listaContainer div {
-    padding-right: 0;
+.listaContainer div div {
+    justify-content: space-between;
 }
 .listaContainer button {
     align-self: flex-start;

@@ -102,9 +102,12 @@
         </div>
     </div>
     <div class="overlay listaContainer">
-        <div>
-            <textarea name="lista" id="lista" placeholder="01/01/2000 23:59 EURUSD-OTC PUT M1"></textarea>
-            <button onclick = "closeList()"> x </button>
+        <div style="flex-direction: column">
+            <div>
+                <h2 style="color: #000"> Programar lista/taxas </h2>
+                <button onclick="closeList()"> x </button>
+            </div>
+            <textarea name="lista" id="lista" placeholder="01/01/2000 23:59 EURUSD-OTC PUT M1" style="margin-top: 0px; margin-bottom: 0px; height: 228px;"></textarea>
         </div>
         <div>
             <button onclick = "startList()"> 

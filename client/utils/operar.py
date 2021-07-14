@@ -10,10 +10,12 @@ class Operacao(IQ_API):
         self.entrou = False
         self.output = output
         self.operacoes_ativas = {}	
+        self.stop_wait_list = False
         self.chat_id = config["chat_id"]
         self.bottoken = config["token"]
         if self.bottoken != "" and self.chat_id != "":
             self.telegram = amanobot.Bot(self.bottoken)
+        self.espera = []
 
         self.mostrar_mensagem(f"📝 Entrando na {config['email']}")
         for _ in range(3):
@@ -88,6 +90,7 @@ class Operacao(IQ_API):
             "loss": self.config['scalper_loss']
         } if (self.config['scalper_win'] != 0 and 
             self.config['scalper_loss'] != 0) else False
+        self.ativar_noticias = False
                 
     def resetar_status(self):
         self.saldo_inicial = self.API.get_balance()
@@ -159,7 +162,7 @@ class Operacao(IQ_API):
                 if self.tipo != "digital" 
                 else self.payout_digital(paridade)), self.tipo
         self.mostrar_mensagem(f"Payout de {paridade}: {tipo} {payout * 100}%", True)
-        return tipo, payout
+        return tipo, payout * 100
 
     def verificar_stop(self, parar = False):
         '''

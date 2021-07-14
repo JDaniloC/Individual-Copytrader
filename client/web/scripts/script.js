@@ -211,7 +211,7 @@ function changeData(data) {
 
 eel.expose(changeStatus)
 function changeStatus() {
-    const status = document.querySelector("header p");
+    const status = document.querySelector("header #status p");
     status.className = "offline";
     status.textContent = "Bateu em um Stop!";
     document.querySelector("header img").style.opacity = 0;

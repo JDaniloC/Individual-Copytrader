@@ -161,8 +161,6 @@ class IQ_API:
             (resultado, lucro)
         '''
         direcao = direcao.lower()
-        hora_atual = datetime.fromtimestamp(
-            datetime.utcnow().timestamp() - 10800)
 
         if self.config.get('prestoploss', False) and (
             self.perda_total - valor <= -self.stoploss):
@@ -253,6 +251,39 @@ class IQ_API:
                 identificador
             )['position-changed']['msg']['status'] == 'open'
             time.sleep(0.3)
+
+    def esperarAte(self, horas, minutos, segundos = 0, 
+        data = (), tolerancia = 0, output = False):
+        '''
+        Espera até determinada data/hora:minuto:segundo do dia
+        Se a data não for passada, será considerada a data atual
+        formato da data: (dia, mes, ano)
+        '''
+        if data == ():
+            data = datetime.now()
+        else:
+            data = datetime(*data[::-1])
+        alvo = datetime.fromtimestamp(
+            data.replace(
+                hour = horas, 
+                minute = minutos, 
+                second = segundos, 
+                microsecond = 0
+            ).timestamp() - tolerancia)
+        agora = datetime.utcnow().timestamp() - 10800 # -3Horas
+        segundos = alvo.timestamp() - agora
+        if segundos > 10:
+            if output:
+                alvo = alvo.fromtimestamp(
+                    alvo.timestamp() + tolerancia
+                )
+                self.mostrar_mensagem(
+                    f"\n ⏳ Próxima operação às {alvo.strftime('%H:%M:%S')} ⏳")
+            time.sleep(segundos)
+            return True
+        if segundos > (-10 - tolerancia):
+            return True
+        return False
 
     @staticmethod
     def martingale(tipo_martin, payout, 
