@@ -167,10 +167,6 @@ function saveChanges(config = null) {
         localStorage.setItem('config', JSON.stringify(config));
         eel.change_config(config);
         closeConfig()
-
-        document.querySelector(
-            ".profile-infos sub"
-        ).innerText = `Conta: ${getValue("#tipo_conta").toUpperCase()}`
     } else if (localStorage.getItem('config') == null) {
         localStorage.setItem('config', JSON.stringify(config));
     } else {

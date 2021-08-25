@@ -29,22 +29,12 @@ class Operacao(IQ_API):
                 self.mostrar_mensagem(e)
         
         if self.entrou:
-            self.salvar_variaveis(config)
             self.resetar_status()
-            profile = self.API.get_profile_async()
+            self.salvar_variaveis(config)
 
-            self.mostrar_mensagem(f"""
-👤 Bem vindo, Trader {profile["name"]}!
-🔰 Conta: {config['tipo_conta'].upper()}
-💰 Banca: $ {self.saldo_inicial}
-💵 Valor da Entrada: $ {self.valor_inicial}
-❇️ Stop Gain: $ {self.stopwin}
-🚫 Stop Loss: $ {self.stoploss}
-
-🚦 Estamos conectados e aguardando entradas...""")
-        
     def salvar_variaveis(self, config):
         self.config.update(config)
+        self.valor = self.config["valor"]
 
         if config['tipo_conta'] == "treino":
             self.mudar_treino()
@@ -92,9 +82,19 @@ class Operacao(IQ_API):
             self.config['scalper_loss'] != 0) else False
         self.ativar_noticias = False
                 
+        profile = self.API.get_profile_async()
+        self.mostrar_mensagem(f"""
+👤 Bem vindo, Trader {profile["name"]}!
+🔰 Conta: {config['tipo_conta'].upper()}
+💰 Banca: $ {self.saldo_inicial}
+💵 Valor da Entrada: $ {self.valor_inicial}
+❇️ Stop Gain: $ {self.stopwin}
+🚫 Stop Loss: $ {self.stoploss}
+
+🚦 Estamos conectados e aguardando entradas...""")
+        
     def resetar_status(self):
         self.saldo_inicial = self.API.get_balance()
-        self.valor = self.config["valor"]
         self.fim_da_operacao = False
         self.ganhos_perdas = [0, 0]      
         self.ocorreu_gale = False
