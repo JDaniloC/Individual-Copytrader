@@ -4,16 +4,18 @@ from utils.IQ import IQ_API
 from pprint import pprint
 
 class Operacao(IQ_API): 
-    def __init__(self, config):
+    def __init__(self, config, output = lambda *x: print(x)):
         self.cadeado = threading.Lock()
         self.config = config
         self.entrou = False
-        self.output = lambda *x: print(x)
+        self.output = output
         self.operacoes_ativas = {}	
+        self.stop_wait_list = False
         self.chat_id = config["chat_id"]
         self.bottoken = config["token"]
         if self.bottoken != "" and self.chat_id != "":
             self.telegram = amanobot.Bot(self.bottoken)
+        self.espera = []
 
         self.mostrar_mensagem(f"📝 Entrando na {config['email']}")
         for _ in range(3):
@@ -27,11 +29,12 @@ class Operacao(IQ_API):
                 self.mostrar_mensagem(e)
         
         if self.entrou:
-            self.salvar_variaveis(config)
             self.resetar_status()
-        
+            self.salvar_variaveis(config)
+
     def salvar_variaveis(self, config):
         self.config.update(config)
+        self.valor = self.config["valor"]
 
         if config['tipo_conta'] == "treino":
             self.mudar_treino()
@@ -77,10 +80,21 @@ class Operacao(IQ_API):
             "loss": self.config['scalper_loss']
         } if (self.config['scalper_win'] != 0 and 
             self.config['scalper_loss'] != 0) else False
+        self.ativar_noticias = False
                 
+        profile = self.API.get_profile_async()
+        self.mostrar_mensagem(f"""
+👤 Bem vindo, Trader {profile["name"]}!
+🔰 Conta: {config['tipo_conta'].upper()}
+💰 Banca: $ {self.saldo_inicial}
+💵 Valor da Entrada: $ {self.valor_inicial}
+❇️ Stop Gain: $ {self.stopwin}
+🚫 Stop Loss: $ {self.stoploss}
+
+🚦 Estamos conectados e aguardando entradas...""")
+        
     def resetar_status(self):
         self.saldo_inicial = self.API.get_balance()
-        self.valor = self.config["valor"]
         self.fim_da_operacao = False
         self.ganhos_perdas = [0, 0]      
         self.ocorreu_gale = False
@@ -148,7 +162,7 @@ class Operacao(IQ_API):
                 if self.tipo != "digital" 
                 else self.payout_digital(paridade)), self.tipo
         self.mostrar_mensagem(f"Payout de {paridade}: {tipo} {payout * 100}%", True)
-        return tipo, payout
+        return tipo, payout * 100
 
     def verificar_stop(self, parar = False):
         '''
@@ -261,9 +275,11 @@ class Operacao(IQ_API):
         def desconta_perda(resultado, lucro, 
             in_gale = "", entrada = None):
             if entrada == None: entrada = valor
+            mensagem = "⚪️"
             if resultado == "win":
                 self.ganho_total += round(lucro, 2)
                 self.ganhos_perdas[0] += 1
+                mensagem = (num_gales * "🐔 ") + "✅"
                 if self.config['tipo_stop'] == "fixo" or (
                     self.config['vez_gale'] != "vela" and
                     tipo_gale == "martingale" and num_gales > 0
@@ -273,9 +289,18 @@ class Operacao(IQ_API):
                 if resultado == 'loose':
                     if "♦️" in in_gale or in_gale == "":
                         self.ganhos_perdas[1] += 1
+                        mensagem = "❌"
+                    else:
+                        mensagem = num_gales * "🐔"
                     lucro = abs(lucro) * -1
                 self.ganho_total -= round(abs(lucro), 2)
                 self.perda_total -= round(abs(lucro), 2)
+            
+            self.mostrar_mensagem(self.format_dir(f"""
+{paridade.upper()}|{tipo.capitalize()} M{tempo} {ordem.upper()}
+💠 Valor: $ {round(entrada, 2)} 
+💰 Resultado: $ {round(lucro, 2)} {mensagem}   
+{in_gale}"""))
 
         tipo_gale = self.config['tipo_gale']
         is_ciclos_gale = tipo_gale in ['ciclos', 'ciclosoros']

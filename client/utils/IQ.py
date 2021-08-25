@@ -1,6 +1,6 @@
 from iqoptionapi.stable_api import IQ_Option
 from datetime import datetime
-import time
+import time, random
 
 class IQ_API:
     def __init__(self, login, senha):
@@ -9,6 +9,7 @@ class IQ_API:
         '''
         self.asset, self.timeframe, self.payout_cache = False, False, {}
         self.API = IQ_Option(login, senha)
+        self.last_user_id = 0
         if not self.conectar():
             raise ConnectionError(" ❌ Não conseguiu se conectar, reveja a senha ❌ ")
 
@@ -36,25 +37,8 @@ class IQ_API:
                 time.sleep(1)
         return False
 
-    def online_top_ranking(self, quantidade, filtro = "Worldwide"):
-        '''
-        Procura o primeiro dos X traders online.
-        '''
-
-        ranking = []
-        contador = 0
-        while contador < 2 and ranking == []:
-            ranking = self.API.get_leader_board(filtro, 1, quantidade, 0)
-            contador += 1
-
-        if ranking == []: return []
-        else:
-            for _trader in ranking['result']['positional']:
-                trader = ranking['result']['positional'][_trader]
-                info = self.API.get_users_availability(trader['user_id'])
-                if info["statuses"][0]["status"] == "online":            
-                    return f"[{trader['flag']}] {trader['user_name']}"
-        return []
+    def format_dir(self, text):
+        return text.replace("CALL", "⬆️").replace("PUT", "⬇️")
 
     def mudar_treino(self):
         '''
@@ -119,11 +103,12 @@ class IQ_API:
                     return True
             return False
         
-        if is_in_list(mensagem, ["is not available", "active_suspended"]):
+        if is_in_list(mensagem, ["is not available", "active_suspended", "active_closed"]):
             mensagem = "Ativo fechado nesta modalidade/timeframe."
         elif "invalid instrument" in mensagem:
             mensagem = "Paridade não encontrada na digital pela IQ." 
-        self.mostrar_mensagem("❌ Não consegui operar: \n" + mensagem)
+        else: "A IQ não permitiu!"
+        self.mostrar_mensagem("❌ " + mensagem)
 
     def ordem(self, paridade, direcao = "call", tempo = 1, 
         valor = 1, tipo = "binary", bloqueador = None, 
@@ -142,8 +127,6 @@ class IQ_API:
             (resultado, lucro)
         '''
         direcao = direcao.lower()
-        hora_atual = datetime.fromtimestamp(
-            datetime.utcnow().timestamp() - 10800)
 
         if self.config.get('prestoploss', False) and (
             self.perda_total - valor <= -self.stoploss):
@@ -180,8 +163,6 @@ class IQ_API:
             if not trying:
                 if self.tipo != "auto": 
                     self.tipo = "binary" if self.tipo == "digital" else "digital"
-                self.mostrar_mensagem("❌ Erro na operação, tentando operar na " + 
-                    ("binária" if tipo == "digital" else "digital"))
                 tipo = "binary" if tipo == "digital" else "digital"
                 
                 opcoes_modalidade = self.payout_cache.get(paridade.upper())
@@ -236,6 +217,39 @@ class IQ_API:
                 identificador
             )['position-changed']['msg']['status'] == 'open'
             time.sleep(0.3)
+
+    def esperarAte(self, horas, minutos, segundos = 0, 
+        data = (), tolerancia = 0, output = False):
+        '''
+        Espera até determinada data/hora:minuto:segundo do dia
+        Se a data não for passada, será considerada a data atual
+        formato da data: (dia, mes, ano)
+        '''
+        if data == ():
+            data = datetime.now()
+        else:
+            data = datetime(*data[::-1])
+        alvo = datetime.fromtimestamp(
+            data.replace(
+                hour = horas, 
+                minute = minutos, 
+                second = segundos, 
+                microsecond = 0
+            ).timestamp() - tolerancia)
+        agora = datetime.utcnow().timestamp() - 10800 # -3Horas
+        segundos = alvo.timestamp() - agora
+        if segundos > 10:
+            if output:
+                alvo = alvo.fromtimestamp(
+                    alvo.timestamp() + tolerancia
+                )
+                self.mostrar_mensagem(
+                    f"\n ⏳ Próxima operação às {alvo.strftime('%H:%M:%S')} ⏳")
+            time.sleep(segundos)
+            return True
+        if segundos > (-10 - tolerancia):
+            return True
+        return False
 
     @staticmethod
     def martingale(tipo_martin, payout, 

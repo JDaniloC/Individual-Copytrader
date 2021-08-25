@@ -128,8 +128,6 @@ function saveChanges(config = null) {
         config.tipo_soros = getValue(
             "#tipo_soros", config.tipo_soros)
         
-        config.wait = parseInt(getValue(
-            "#wait", config.wait))
         config.delay = parseInt(getValue(
             "#delay", config.delay))
         config.max_gale = parseInt(getValue(
@@ -163,10 +161,6 @@ function saveChanges(config = null) {
         localStorage.setItem('config', JSON.stringify(config));
         eel.change_config(config);
         closeConfig()
-
-        document.querySelector(
-            ".profile-infos sub"
-        ).innerText = `Conta: ${getValue("#tipo_conta").toUpperCase()}`
     } else if (localStorage.getItem('config') == null) {
         localStorage.setItem('config', JSON.stringify(config));
     } else {
@@ -197,7 +191,7 @@ function loadConfig() {
     setValue(config.max_soros, "#max_soros")
     setValue(config.max_gale, "#max_gale")
     setValue(config.vez_gale, "#vez_gale")
-
+    
     if (config['delay'] != false) {
         document.querySelector("#delaye").checked = true;
         setValue(config.delay, "#delay")

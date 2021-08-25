@@ -241,8 +241,10 @@ async function startList() {
     lista.forEach((item) => {
         const timeframe = (item.timeframe !== 0) ? 
             item.timeframe : order.timeframe / 60;
-        const paridade = String(item.ordem).toUpperCase()
-        addListItem(item.par, paridade, item.textHour, timeframe)
+        const direcao = item.tipo === "lista" ? String(
+            item.ordem).toUpperCase() : item.taxa;
+
+        addListItem(item.par, direcao, item.textHour, timeframe)
     })
     eel.seguir_lista(lista)
 }

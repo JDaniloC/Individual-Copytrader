@@ -14,10 +14,53 @@ try:
     from dontpad import Dontpad
     from os import listdir
 
-    def pegar_comando(texto):
-        def datetime_brazil():
-            return datetime.fromtimestamp(
-                datetime.utcnow().timestamp() - 10800)
+    def timestamp_brazil():
+        return datetime.utcnow().timestamp() - 10800
+
+    def pegar_comando_taxas(texto):
+        '''
+        Recebe um texto e devolve:
+        {
+            "par": paridade,
+            "taxa": int
+            "tipo": "taxas"
+        }
+        '''
+        try:
+            timeframe = re.search(r'[MH][1-6]?[0-5]', texto.upper())
+            if timeframe: 
+                texto = re.sub(r'[MH][1-6]?[0-5]', r'', texto.upper())
+                if "M" in timeframe[0].upper(): 
+                    timeframe = int(timeframe[0].strip("M"))
+                else: 
+                    timeframe = int(timeframe[0].strip("H")) * 60
+            else: timeframe = 0
+
+            primeiro, segundo = re.split(r"[^\w.-]+", texto.strip())
+            par = re.search(r'[A-Za-z]{6}(-OTC)?', 
+                primeiro.upper().replace("/", ""))
+            if not par:
+                par = re.search(r'[A-Za-z]{6}(-OTC)?', 
+                    segundo.upper().replace("/", ""))[0]
+                taxa = float(primeiro)
+            else:
+                par = par[0]
+                taxa = float(segundo)
+        except Exception as e:
+            print(type(e), e)
+            print(f"Revise o comando {texto}")
+            return {}
+            
+        return {
+            "par": par, 
+            "taxa": taxa, 
+            "tipo": "taxas",
+            "textHour": "Taxas",
+            "timeframe": timeframe,
+            "timestamp": timestamp_brazil()
+        }
+
+    def pegar_comando_lista(texto):
         def timestamp(data, hora):
             return datetime(
                 data[2], data[1], data[0], hora[0], hora[1]
@@ -27,15 +70,14 @@ try:
             if data:
                 data = [int(x) for x in re.split(r"\W", data[0])]
             else:
-                hoje = datetime_brazil()
+                hoje = datetime.fromtimestamp(timestamp_brazil())
                 data = [hoje.day, hoje.month, hoje.year]
             textHour = re.search(r'\d{2}:\d{2}', texto)[0]
             hora = [int(x) for x in re.split(r'\W', textHour)]
             par = re.search(r'[A-Za-z]{6}(-OTC)?', 
                 texto.upper().replace("/", ""))[0]
             ordem = re.search(r'CALL|PUT', texto.upper())[0].lower()
-            timeframe = re.search(
-                r'[MH][1-6]?[0-5]', texto.upper())
+            timeframe = re.search(r'[MH][1-6]?[0-5]', texto.upper())
             if timeframe: 
                 if "M" in timeframe[0].upper(): 
                     timeframe = int(timeframe[0].strip("M"))
@@ -47,14 +89,26 @@ try:
             return {}
 
         return {
-            "textHour": textHour,
+            "par": par,
             "data": data,
             "hora": hora,
-            "par": par,
             "ordem": ordem,
+            "tipo": "lista",
+            "textHour": textHour,
             "timeframe": timeframe,
             "timestamp": timestamp(data, hora)
         }
+
+    def pegar_comando(texto):
+        '''
+        Verifica se a entrada é de lista ou taxas
+        e devolve um dicionário no qual um dos valores
+        é {tipo: lista|taxa}.
+        '''
+        comando = pegar_comando_lista(texto)
+        if comando == {}:
+            comando = pegar_comando_taxas(texto)
+        return comando
 
     def esperarAte(horas, minutos, data = (), tolerancia = 0):
         if data == ():
@@ -99,6 +153,9 @@ try:
 
         def seguir_lista(self, lista):
             for index, comando in enumerate(lista):
+                if comando["tipo"] == "taxas":
+                    eel.selectItemList(index)
+                    continue
                 data = comando["data"]
                 horas, minutos = comando["hora"]
                 tempo = (comando['timeframe'] 
@@ -108,13 +165,11 @@ try:
                 if esperarAte(horas, minutos, data, 2) and self.updating:
                     par = comando['par']
                     ordem = comando['ordem']
-                    threading.Thread(
-                        target=api.ordem, 
-                        args = (ordem, (par, tempo)),
-                        daemon = True
-                    ).start()
+                    threading.Thread(target=api.ordem, 
+                        args = (ordem, (par, tempo), False),
+                        daemon = True).start()
                 eel.selectItemList(index)
-                
+                                
                 if not self.updating: break
 
         def get_candles(self):
@@ -149,14 +204,15 @@ try:
 
             return result
         
-        def ordem(self, direcao, data = False):
+        def ordem(self, direcao, data = False, send = True):
             def enviar_sinal(par, direcao, tempo, tipo):
-                Dontpad.write("copytrader/" + self.url, 
-                    json.dumps({"orders": [{
-                        "asset": par, "order": direcao, "type": tipo,
-                        "timeframe": tempo, "timestamp": time.time()
-                    }]}
-                ))
+                if send:
+                    Dontpad.write("copytrader/" + self.url, 
+                        json.dumps({"orders": [{
+                            "asset": par, "order": direcao, "type": tipo,
+                            "timeframe": tempo, "timestamp": time.time()
+                        }]}
+                    ))
 
                 eel.animatePopUp("add.svg", "Ordem adicionada!")
                 eel.createOrder(par.upper(), direcao.upper(), 
@@ -262,6 +318,8 @@ try:
 
     @eel.expose
     def seguir_lista(lista):
+        Dontpad.write("copytrader/" + api.url, 
+                json.dumps({"orders": lista}))
         threading.Thread(
             target=api.seguir_lista, 
             args = (lista, ),
@@ -269,7 +327,7 @@ try:
         ).start()
 
     def get_data():
-        f = Fernet(b'yqzmMSzGGdoYCfIu_OCE5VEQeDh5v5M6vqjDqhAGYk0=')
+        f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
         try:
             with open("config/data.dll", "rb") as file:
                 message = f.decrypt(file.readline()).decode()
@@ -296,8 +354,8 @@ try:
         return mensagem
 
     def procurar_licenca(filetext = ""):
-        f = Fernet(b'cHJvN6obAWDiWc5ghyYrPTuPx5x2a8DKr55RVQIMT50=')
-        dia, mes, ano = 17, 2, 2021
+        f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
+        dia, mes, ano = 1, 7, 2021
         email, hora, minuto = "", 0, 0
 
         def decrypt(text):
@@ -318,7 +376,8 @@ try:
                 indice = list(map(lambda x:".key" in x, files)).index(True)
                 with open(f"{files[indice]}", "rb") as file:
                     email, dia, mes, ano, hora, minuto = decrypt(file.readline())
-            except:
+            except Exception as e:
+                print(type(e), e)
                 try:
                     with open("license.key", "rb") as file:
                         message = f.decrypt(file.readline()).decode()

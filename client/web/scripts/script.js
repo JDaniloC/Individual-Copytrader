@@ -147,10 +147,10 @@ async function login(event) {
         ).style.display = "none"; 
         if (result) {
             loadConfig();
-            const status = document.querySelector("header p");
+            const status = document.querySelector("header div#status p");
             status.className = "online";
             status.textContent = "Online";
-            document.querySelector("header img").style.opacity = 1;
+            document.querySelector("header div#status img").style.opacity = 1;
         }
     } else {
         button.innerText = 'Entrar';
@@ -206,7 +206,7 @@ function changeData(data) {
 
 eel.expose(changeStatus)
 function changeStatus() {
-    const status = document.querySelector("header p");
+    const status = document.querySelector("header #status p");
     status.className = "offline";
     status.textContent = "Bateu em um Stop!";
     document.querySelector("header img").style.opacity = 0;

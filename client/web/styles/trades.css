@@ -1,7 +1,7 @@
 main ul {
     display: flex;
     flex-wrap: wrap;
-    max-height: calc(100vh - 260px);
+    max-height: calc(100vh - 330px);
     overflow: auto;
     width: 90%;
     overflow-x: clip;
