@@ -157,7 +157,7 @@ async function login(event) {
     }
 }
 eel.expose(changeLicense)
-function changeLicense(email, texto, ranking) {
+function changeLicense(email, texto) {
     if (texto === "Renove sua licença") {
         document.querySelector(
             ".login button"
@@ -171,11 +171,6 @@ function changeLicense(email, texto, ranking) {
             "input[type=email]")
         input.value = email;
         input.disabled = true;
-    }
-    if (!ranking) {
-        document.querySelector(
-            "#changeTop"
-        ).disabled = true
     }
 }
 
