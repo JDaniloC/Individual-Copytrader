@@ -3,12 +3,17 @@ from datetime import datetime
 from utils.IQ import IQ_API
 from pprint import pprint
 
+generic = lambda *x: print(x)
+
 class Operacao(IQ_API): 
-    def __init__(self, config, output = lambda *x: print(x)):
+    def __init__(self, config, output = generic,
+        updateGeral = generic, placeTrade = generic):
         self.cadeado = threading.Lock()
+        self.updateGeral = updateGeral
+        self.placeTrade = placeTrade
+        self.output = output
         self.config = config
         self.entrou = False
-        self.output = output
         self.operacoes_ativas = {}	
         self.stop_wait_list = False
         self.chat_id = config["chat_id"]
@@ -17,7 +22,7 @@ class Operacao(IQ_API):
             self.telegram = amanobot.Bot(self.bottoken)
         self.espera = []
 
-        self.mostrar_mensagem(f"📝 Entrando na {config['email']}")
+        self.atualizar_geral(f"📝 Entrando na {config['email']}")
         for _ in range(3):
             try:
                 super().__init__(
@@ -83,7 +88,7 @@ class Operacao(IQ_API):
         self.ativar_noticias = False
                 
         profile = self.API.get_profile_async()
-        self.mostrar_mensagem(f"""
+        self.atualizar_geral(f"""
 👤 Bem vindo, Trader {profile["name"]}!
 🔰 Conta: {config['tipo_conta'].upper()}
 💰 Banca: $ {self.saldo_inicial}
@@ -106,6 +111,12 @@ class Operacao(IQ_API):
         self.config["ciclos"] = {
             "gales": 0, "soros": 0
         }
+
+    def atualizar_geral(self, message):
+        today = datetime.now()
+        self.updateGeral(today.strftime("%d/%m/%Y"), 
+            today.strftime("%H:%M"), 
+            message.strip().replace("\n", "<br>"))
 
     def mostrar_mensagem(self, mensagem, logs = False):
         '''
@@ -326,6 +337,7 @@ class Operacao(IQ_API):
                     f"🔸 Operando no {ciclo_atual + 1}° ciclo de {modalidade}: R$ {round(valor, 2)}")
 
         resultado, lucro = None, 0
+        self.placeTrade(paridade, ordem, tempo, valor)
         for _ in range(2):
             try:
                 resultado, lucro, tipo = self.ordem(

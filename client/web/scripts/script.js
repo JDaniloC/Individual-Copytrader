@@ -92,30 +92,23 @@ function getImage(asset) {
     }
 }
 eel.expose(placeTrade)
-function placeTrade(asset, order, timeframe, id) {
+function placeTrade(asset, direction, timeframe, value, id) {
     const ul = document.querySelector("main ul");
     const li = document.createElement("li");
-    const img = document.createElement("img");
-    img.src = getImage(asset);
-    const div1 = document.createElement("div");
-    const div2 = document.createElement("div");
-    const h31 = document.createElement("h3");
-    h31.innerText = asset;
-    const h32 = document.createElement("h3");
-    h32.innerText = 'Em andamento'
-    h32.id = "id" + id;
-    const p1 = document.createElement("p");
-    p1.innerText = order;
-    const p2 = document.createElement("p");
-    p2.innerText = "M" + timeframe;
+    li.innerHTML = `
+    <img src="${getImage(asset)}">
+    <div>
+        <h3> ${asset} </h3>
+        <p> ${direction} </p>
+    </div>
+    <div> 
+        <h3 id="id${id}">
+            Em andamento
+        </h3>
+        <p> M${timeframe} R$${value}</p>
+    </div>
+    `
     ul.appendChild(li);
-    li.appendChild(img);
-    li.appendChild(div1);
-    li.appendChild(div2);
-    div1.appendChild(h31);
-    div1.appendChild(p1);
-    div2.appendChild(h32);
-    div2.appendChild(p2);
 }
 
 eel.expose(updateInfos)

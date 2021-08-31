@@ -209,6 +209,7 @@ class IQ_API:
                     self.mostrar_mensagem(f"Payout na {tipo} está abaixo do aceitável {payout_atual}% < {self.config['minimo']}%")
             return "error", 0, tipo
 
+        self.mostrar_mensagem(f"✅ Trade realizado: {paridade} R$ {valor}")
         lucro = 0
         if delay == False:
             # Versão que pega no histórico
