@@ -97,12 +97,6 @@ class Gerador(Frame):
             Label(self, text = nome).grid(row = indice + 3)
             Entry(self, textvariable = self.titles[nome]).grid(row = indice + 3, column = 1)
         
-        self.titles["ranking"] = BooleanVar()
-        Checkbutton(self, text = "Top ranking", 
-            variable = self.titles["ranking"],
-            onvalue = True, offvalue = False,
-            ).grid(row = len(self.titles) + 2, columnspan = 2)
-        
         button = Button(self, text = "Gerar licença", command = self.gerar)
         outro = Button(self, text = "Gerar teste", command = self.testar)
         if self.atual >= self.total or self.pirateado:
@@ -149,21 +143,20 @@ class Gerador(Frame):
             ano = self.titles['ano'].get()
             hora = self.titles['hora'].get()
             minuto = self.titles['minuto'].get()
-            ranking = self.titles['ranking'].get()
 
-            self.criar_licenca(email, dia, mes, ano, hora, minuto, ranking)
+            self.criar_licenca(email, dia, mes, ano, hora, minuto)
         else:
             messagebox.showwarning("Licença", 
         "Você atingiu o máximo de licenças geradas. Compre mais licenças.")
 
-    def criar_licenca(self, email, dia, mes, ano, hora, minuto, ranking): 
+    def criar_licenca(self, email, dia, mes, ano, hora, minuto): 
         '''
         Criptografa uma mensagem com todos os dados (email e data)
         E escreve em um arquivo.
         '''
         f = Fernet(USER_KEY)
         with open(email + ".key", "wb") as file:
-            message = f"{email}|{dia}/{mes}/{ano}|{hora}:{minuto}|{ranking}"
+            message = f"{email}|{dia}/{mes}/{ano}|{hora}:{minuto}"
             result = f.encrypt(message.encode())
             file.write(result)
         messagebox.showinfo("Informação", "Arquivo gerado.")
