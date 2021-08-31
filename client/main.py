@@ -1,12 +1,18 @@
-import traceback
 from utils.lista_taxa import ListaTaxa as Operacao
-import eel, time, json, threading
+import eel, time, json, threading, traceback
 
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 from dontpad import Dontpad
 from random import randint
 from os import listdir
+
+def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
+def updateGeral(*args, **kwargs): eel.updateGeral(*args, *kwargs)
+def placeTrade(paridade, direcao, tempo, valor): 
+    paridade, direcao = paridade.upper(), direcao.upper()
+    eel.placeTrade(paridade, direcao, tempo, valor, api.id)
+    api.id += 1
 
 class IQOption:
     def __init__(self):
@@ -56,7 +62,8 @@ class IQOption:
         
         try:
             eel.loadConfig()(set_config)
-            self.API = Operacao(config, addLog)
+            self.API = Operacao(config, addLog, 
+                updateGeral, placeTrade)
             return True
         except Exception as e:
             print(type(e), e)
@@ -64,9 +71,6 @@ class IQOption:
 
     def ordem(self, par, tipo, direcao, tempo):
         id = self.id
-        eel.placeTrade(par.upper(), direcao.upper(), tempo, id)
-        self.id += 1
-
         resultado = self.API.realizar_trade(self.API.valor, 
             par, direcao, tempo, 0.7, tipo)
 
@@ -114,8 +118,6 @@ class IQOption:
 api = IQOption()
 eel.init('web')
 
-def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
-
 @eel.expose
 def change_operation(): 
     if api.premium: 
@@ -123,6 +125,7 @@ def change_operation():
         addLog(today.strftime("%d/%m/%Y"), 
             today.strftime("%H:%M"), 
             "🔰 Esperando entradas do ADM.")
+
 @eel.expose
 def verify_connection(email, password):
     if not api.login(email, password):
@@ -135,9 +138,7 @@ def verify_connection(email, password):
     except: return False
 
 def save_config():
-    dic = {
-        "id": api.url,
-    }
+    dic = { "id": api.url }
     with open("config/data.json", "w") as file:
         json.dump(dic, file, indent = 2)
         

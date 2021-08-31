@@ -214,3 +214,12 @@ function addLog(date, hour, message) {
 
     logs.scrollBy(0, 200);
 }
+eel.expose(updateGeral)
+function updateGeral(date, hour, message) {
+    let logs = document.querySelector("div.logs ul");
+    let firstLog = logs.querySelector("li");
+    firstLog.innerHTML = `
+    <div>
+        <p> ${date} </p> <p> ${hour} </p>
+    </div> <p> ${message} </p>`
+}
