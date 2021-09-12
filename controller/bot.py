@@ -11,8 +11,8 @@ try:
 
     from datetime import datetime, timedelta
     from cryptography.fernet import Fernet
-    from dontpad import Dontpad
     from os import listdir
+    from api import Api
 
     def timestamp_brazil():
         return datetime.utcnow().timestamp() - 10800
@@ -207,12 +207,10 @@ try:
         def ordem(self, direcao, data = False, send = True):
             def enviar_sinal(par, direcao, tempo, tipo):
                 if send:
-                    Dontpad.write("copytrader/" + self.url, 
-                        json.dumps({"orders": [{
-                            "asset": par, "order": direcao, "type": tipo,
-                            "timeframe": tempo, "timestamp": time.time()
-                        }]}
-                    ))
+                    Api.write({"orders": [{
+                        "asset": par, "order": direcao, "type": tipo,
+                        "timeframe": tempo, "timestamp": time.time()
+                    }]})
 
                 eel.animatePopUp("add.svg", "Ordem adicionada!")
                 eel.createOrder(par.upper(), direcao.upper(), 
@@ -318,8 +316,7 @@ try:
 
     @eel.expose
     def seguir_lista(lista):
-        Dontpad.write("copytrader/" + api.url, 
-                json.dumps({"orders": lista}))
+        Api.write({"orders": lista})
         threading.Thread(
             target=api.seguir_lista, 
             args = (lista, ),

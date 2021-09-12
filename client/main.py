@@ -3,9 +3,9 @@ import eel, time, json, threading, traceback
 
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-from dontpad import Dontpad
 from random import randint
 from os import listdir
+from api import Api
 
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 def updateGeral(*args, **kwargs): eel.updateGeral(*args, *kwargs)
@@ -113,7 +113,7 @@ class IQOption:
                 except Exception as e: print(type(e), e)
             
             if self.adm_list:
-                response = json.loads(Dontpad.read("copytrader/" + self.url))
+                response = Api.read()
                 try:
                     trade_list = response.get('orders', [])
                     if len(trade_list) > 1 and trade_list != self.lista_atual:
@@ -167,9 +167,9 @@ def verify_connection(email, password):
     if not api.login(email, password):
         return None
     try:
-        json.loads(Dontpad.read("copytrader/" + api.url))
-        threading.Thread(
-            target = api.auto_trade, daemon = True).start()
+        Api.read()
+        threading.Thread(target = api.auto_trade, 
+            daemon = True).start()
         return True
     except: return False
 
