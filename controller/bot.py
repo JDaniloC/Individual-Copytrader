@@ -141,7 +141,6 @@ try:
             self.timeframe = 60
             self.amount = 2
             self.updating = False
-            self.url = ""
         
         def login(self, email, password):
             self.API = IQ_Option(email, password)
@@ -341,7 +340,7 @@ try:
     def devolve_restante(tempo_restante):
         if  tempo_restante < 0:
             mensagem = "Renove sua licença"
-            api.url = None
+            Api.main_url = None
         else:
             horas_minutos = timedelta(seconds = tempo_restante)
             duracao = str(horas_minutos)[:-7].replace('days', 'dias')
@@ -398,9 +397,6 @@ try:
                 file.write(filetext.encode("utf-8"))
 
     get_data()
-    with open("config/data.json") as file:
-        resultado = json.load(file)
-        api.url = resultado['id']
 
     mensagem, email, caminho = procurar_licenca()
     eel.changeLicense(email, mensagem)

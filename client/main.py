@@ -19,7 +19,6 @@ class IQOption:
         self.API = None
         self.id = 0
         self.wait = 1
-        self.url = ""
         self.inicio = 1
         self.final = 100
         self.timeframe = 1
@@ -173,18 +172,12 @@ def verify_connection(email, password):
         return True
     except: return False
 
-def save_config():
-    dic = { "id": api.url }
-    with open("config/data.json", "w") as file:
-        json.dump(dic, file, indent = 2)
-        
 @eel.expose
 def change_config(config):
     api.API.salvar_variaveis(config)
     api.timeframe = int(config.get("timeframe", 1))
     api.reverso = bool(config.get("reverso", False))
     api.final = int(config.get("topranking", 100))
-    save_config()
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
 
@@ -206,7 +199,7 @@ def get_data():
 def devolve_restante(tempo_restante):
     if  tempo_restante < 0:
         mensagem = "Renove sua licença"
-        api.url = None
+        Api.main_url = None
     else:
         horas_minutos = timedelta(seconds = tempo_restante)
         duracao = str(horas_minutos)[:-7].replace('days', 'dias')
@@ -262,9 +255,6 @@ def search_license(text):
             file.write(filetext.encode("utf-8"))
 
 get_data()
-with open("config/data.json") as file:
-    resultado = json.load(file)
-    api.url = resultado['id']
 
 mensagem, email, ranking, caminho = procurar_licenca()
 eel.changeLicense(email, mensagem, ranking)
