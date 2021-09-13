@@ -2,7 +2,7 @@
 
 > An copytrader for IQ platform where the ADM sends trades to their clients
 
-![copytrader start](./docs/run.png)
+![copytrader start](./run.png)
 
 ## Version 1 - Google Cloud Platform
 > Using Google Cloud VM to host a simple server that provides the communication between client-server.
@@ -15,7 +15,7 @@
 2. Setuping the VM
     1. Create a new FireWall rule at VPC Network
     2. Follow this configuration:
-        ![settings](./docs/settings.png)
+        ![settings](./settings.png)
     3. Turn on the Cloud Shell and 
         ```bash
         sudo apt-get install ufw
@@ -46,4 +46,4 @@
 ### Setup
 Modify the "id" field in the config/data.json file, using the same word to "connect" the client to the controller. So generate a generator license using the gerador.py, and with the license file you can generate the new license file for the bots.
 
-![copytrader start](./docs/status.png)
+![copytrader start](./status.png)

@@ -356,7 +356,7 @@ try:
 
         def decrypt(text):
             message = f.decrypt(text).decode()
-            email, data, horario, _ = message.split("|")
+            email, data, horario = message.split("|")
             dia, mes, ano = list(map(int, data.split("/")))
             hora, minuto = list(map(int, horario.split(":")))
             return email, dia, mes, ano, hora, minuto
