@@ -334,14 +334,14 @@ class WebsocketClient(object):
             id = message["msg"]["id"]
             self.api.socket_option_closed[id] = message
         elif message["name"] == "live-deal-binary-option-placed":
-            name = message["name"]
+            # name = message["name"]
             active_id = message["msg"]["active_id"]
             active = list(OP_code.ACTIVES.keys())[
                 list(OP_code.ACTIVES.values()).index(active_id)]
             _type = message["msg"]["option_type"]
             try:
-                self.api.live_deal_data[name][active][_type].appendleft(
-                    message["msg"])
+                # self.api.live_deal_data[name][active][_type].appendleft(
+                #     message["msg"])
                 if hasattr(self.api.binary_live_deal_cb, '__call__'):
                     cb_data = {
                         "active": active,
@@ -354,14 +354,14 @@ class WebsocketClient(object):
             except:
                 pass
         elif message["name"] == "live-deal-digital-option":
-            name = message["name"]
+            # name = message["name"]
             active_id = message["msg"]["instrument_active_id"]
             active = list(OP_code.ACTIVES.keys())[
                 list(OP_code.ACTIVES.values()).index(active_id)]
             _type = message["msg"]["expiration_type"]
             try:
-                self.api.live_deal_data[name][active][_type].appendleft(
-                    message["msg"])
+                # self.api.live_deal_data[name][active][_type].appendleft(
+                #     message["msg"])
                 if hasattr(self.api.digital_live_deal_cb, '__call__'):
                     cb_data = {
                         "active": active,
@@ -377,14 +377,23 @@ class WebsocketClient(object):
         elif message["name"] == "leaderboard-deals-client":
             self.api.leaderboard_deals_client = message["msg"]
         elif message["name"] == "live-deal":
-            name = message["name"]
+            # name = message["name"]
             active_id = message["msg"]["instrument_active_id"]
             active = list(OP_code.ACTIVES.keys())[
                 list(OP_code.ACTIVES.values()).index(active_id)]
             _type = message["msg"]["instrument_type"]
             try:
-                self.api.live_deal_data[name][active][_type].appendleft(
-                    message["msg"])
+                # self.api.live_deal_data[name][active][_type].appendleft(
+                #     message["msg"])
+                if hasattr(self.api.live_deal_cb, '__call__'):
+                    cb_data = {
+                        "active": active,
+                        **message["msg"]
+                    }
+                    livedeal = Thread(target=self.api.live_deal_cb,
+                                      kwargs=(cb_data))
+                    livedeal.daemon = True
+                    livedeal.start()
             except:
                 pass
 
@@ -394,6 +403,10 @@ class WebsocketClient(object):
             self.api.leaderboard_userinfo_deals_client = message["msg"]
         elif message["name"] == "users-availability":
             self.api.users_availability = message["msg"]
+        elif message["name"] == "client-price-generated":
+            ask_price = [d for d in message["msg"]["prices"] if d['strike'] == 'SPT'][0]['call']['ask']
+            self.api.digital_payout = int(((100-ask_price)*100)/ask_price)
+            self.api.client_price_generated = message["msg"]
         else:
             pass
         global_value.ssl_Mutual_exclusion = False

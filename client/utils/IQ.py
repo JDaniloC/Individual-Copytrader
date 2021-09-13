@@ -185,7 +185,7 @@ class IQ_API:
                 status, identificador = self.API.buy(
                     valor, paridade, direcao, tempo)
             else:
-                status, identificador = self.API.buy_digital_spot(
+                status, identificador = self.API.buy_digital_spot_v2(
                     paridade, valor, direcao, tempo)
 
         if not status:
@@ -216,10 +216,6 @@ class IQ_API:
             if tipo == "binary":
                 resultado, lucro = self.API.check_win_v4(identificador) 
             else:
-                if scalper:
-                    self.API.subscribe_strike_list(paridade, 1)
-                    self.scalper(identificador, valor, scalper)
-                    self.API.unsubscribe_strike_list(paridade, 1)
                 status = False
                 time.sleep((tempo * 60) - 10)
                 while not status:
