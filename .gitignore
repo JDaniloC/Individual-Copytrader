@@ -6,3 +6,4 @@ debug.log
 license
 build/
 dist/
+venv/

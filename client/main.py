@@ -3,9 +3,9 @@ import eel, time, json, threading, traceback
 
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-from dontpad import Dontpad
 from random import randint
 from os import listdir
+from api import Api
 
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 def updateGeral(*args, **kwargs): eel.updateGeral(*args, *kwargs)
@@ -19,7 +19,6 @@ class IQOption:
         self.API = None
         self.id = 0
         self.wait = 1
-        self.url = ""
         self.inicio = 1
         self.final = 100
         self.timeframe = 1
@@ -87,7 +86,7 @@ class IQOption:
             self.API.ganho_total > -self.API.stoploss):
 
             time.sleep(self.wait)
-            response = json.loads(Dontpad.read("copytrader/" + self.url))
+            response = Api.read()
             try:
                 trade_list = response.get('orders', [])
                 if len(trade_list) > 1 and trade_list != self.lista_atual:
@@ -100,7 +99,6 @@ class IQOption:
                         self.API.operar_lista_taxas()).start()
                     continue
                 elif len(trade_list) > 1: continue
-                
                 for trade in trade_list:
                     timestamp = trade['timestamp']
                     if time.time() - timestamp < self.wait + 2:
@@ -131,17 +129,12 @@ def verify_connection(email, password):
     if not api.login(email, password):
         return None
     try:
-        json.loads(Dontpad.read("copytrader/" + api.url))
-        threading.Thread(
-            target = api.auto_trade, daemon = True).start()
+        Api.read()
+        threading.Thread(target = api.auto_trade, 
+            daemon = True).start()
         return True
     except: return False
 
-def save_config():
-    dic = { "id": api.url }
-    with open("config/data.json", "w") as file:
-        json.dump(dic, file, indent = 2)
-        
 @eel.expose
 def change_config(config):
     api.API.salvar_variaveis(config)
@@ -169,7 +162,7 @@ def get_data():
 def devolve_restante(tempo_restante):
     if  tempo_restante < 0:
         mensagem = "Renove sua licença"
-        api.url = None
+        Api.main_url = None
     else:
         horas_minutos = timedelta(seconds = tempo_restante)
         duracao = str(horas_minutos)[:-7].replace('days', 'dias')
@@ -225,9 +218,6 @@ def search_license(text):
             file.write(filetext.encode("utf-8"))
 
 get_data()
-with open("config/data.json") as file:
-    resultado = json.load(file)
-    api.url = resultado['id']
 
 mensagem, email, caminho = procurar_licenca()
 eel.changeLicense(email, mensagem)
