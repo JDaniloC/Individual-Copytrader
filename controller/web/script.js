@@ -42,7 +42,17 @@ const digitalOptions = [
     {image: "https://static.cdnpub.info/files/storage/public/5b/50/80e2cc14c.svg", 
         title: "AUD/JPY"},
     {image: "https://static.cdnpub.info/files/storage/public/5b/50/820142ec6.svg", 
-        title: "AUD/CAD"}
+        title: "AUD/CAD"},
+    {image: "https://static.cdnroute.io/files/storage/public/5b/50/81e357c97.svg", 
+        title: "ETH/USD"},
+    {image: "https://static.cdnroute.io/files/storage/public/5b/50/81f9b71a0.svg", 
+        title: "BTC/USD"},
+    {image: "https://static.cdnroute.io/files/storage/public/5b/50/81b96c88e.svg", 
+        title: "XRP/USD"},
+    {image: "https://static.cdnroute.io/files/storage/public/5b/50/7f61bcab0.svg", 
+        title: "EOS/USD"},
+    {image: "https://static.cdnroute.io/files/storage/public/5c/7f/89fa9381e3c5h4e1c5.svg", 
+        title: "LTC/USD"},
 ];
 const binaryOptions = [
     {image: "https://static.cdnpub.info/files/storage/public/5b/50/7ea1cbfaf.svg", 
@@ -93,6 +103,12 @@ const otcOptions = [
         title: "USD/CHF (OTC)"},
     {image: "https://static.cdnpub.info/files/storage/public/5d/5a/9125f3bd49c6i0i9e6.svg", 
         title: "EUR/JPY (OTC)"},
+    {image: "https://static.cdnroute.io/files/storage/public/5f/7f/1e2997d0e9c7j7f4g0/USDHKD_OTC.png", 
+        title: "USD/HKD (OTC)"},
+    {image: "https://static.cdnroute.io/files/storage/public/5f/35/3ae8bf1547c9d7j0f6/USDZAR_OTC.png", 
+        title: "USD/ZAR (OTC)"},
+    {image: "https://static.cdnroute.io/files/storage/public/5f/7f/1e280cd7d1a7d1b0d6/USDSGD_OTC.png", 
+        title: "USD/SGD (OTC)"},
 ]
 
 eel.expose(addCandles)
