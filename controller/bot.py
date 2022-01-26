@@ -147,6 +147,10 @@ try:
             self.API.connect()
             if self.API.check_connect():
                 self.API.change_balance("PRACTICE")
+                threading.Thread(
+                    target = self.searchTrades, 
+                    daemon=True
+                ).start()
                 return True
             return False
 
@@ -203,18 +207,32 @@ try:
 
             return result
         
-        def ordem(self, direcao, data = False, send = True):
-            def enviar_sinal(par, direcao, tempo, tipo):
-                if send:
-                    Api.write({"orders": [{
-                        "asset": par, "order": direcao, "type": tipo,
-                        "timeframe": tempo, "timestamp": time.time()
-                    }]})
+        def searchTrades(self):
+            old_trades = {}
+            while True:
+                for trade in self.API.get_open_trades():
+                    trade_id = trade['id']
+                    paridade = trade['asset']
+                    tempo = trade['timeframe']
+                    direcao = trade['direction']
+                    if trade_id not in old_trades:
+                        old_trades[trade_id] = trade
+                        self.enviar_sinal(paridade, direcao, tempo, "binary")
+                time.sleep(0.5)
 
-                eel.animatePopUp("add.svg", "Ordem adicionada!")
-                eel.createOrder(par.upper(), direcao.upper(), 
-                    tipo.capitalize(), tempo * 60)
-            
+        @staticmethod
+        def enviar_sinal(par, direcao, tempo, tipo, send = True):
+            if send:
+                Api.write({"orders": [{
+                    "asset": par, "order": direcao, "type": tipo,
+                    "timeframe": tempo, "timestamp": time.time()
+                }]})
+
+            eel.animatePopUp("add.svg", "Ordem adicionada!")
+            eel.createOrder(par.upper(), direcao.upper(), 
+                tipo.capitalize(), tempo * 60)
+
+        def ordem(self, direcao, data = False, send = True):
             direcao = direcao.lower()
             if data:
                 par, tempo = data
@@ -223,8 +241,8 @@ try:
                 tempo = self.timeframe // 60
             valor, tipo = self.amount, self.option
             
-            threading.Thread(target = enviar_sinal, 
-                args = (par, direcao, tempo, tipo)).start()
+            threading.Thread(target = self.enviar_sinal, 
+                args = (par, direcao, tempo, tipo, send)).start()
 
             if tipo == "binary" and tempo == 5:
                 atual = datetime.utcnow()
@@ -281,7 +299,9 @@ try:
     @eel.expose
     def start_capture():
         threading.Thread(
-            target = api.update_candles, daemon=True).start()
+            target = api.update_candles, 
+            daemon=True).start()
+
     @eel.expose
     def stop_capture():
         api.updating = False
