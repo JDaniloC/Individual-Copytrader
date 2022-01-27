@@ -3,7 +3,6 @@ import eel, time, json, threading, traceback
 
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-from random import randint
 from os import listdir
 from api import Api
 
@@ -54,13 +53,9 @@ class IQOption:
             "tipo_stop": "fixo", "tipo_par": "auto", 
             "vez_gale": "vela",
         }
-        def set_config(_config): 
-            if _config == None:
-                _config = config
-            eel.saveChanges(_config)
-        
+
         try:
-            eel.loadConfig()(set_config)
+            eel.loadConfig(config)
             self.API = Operacao(config, addLog, 
                 updateGeral, placeTrade)
             return True
@@ -95,20 +90,23 @@ class IQOption:
                     self.API.comandos = trade_list
                     self.lista_atual = trade_list
                     self.API.comando_atual = 0
-                    threading.Thread(daemon = True, target = 
-                        self.API.operar_lista_taxas()).start()
+                    threading.Thread(
+                        target = self.API.operar_lista_taxas,
+                        daemon = True).start()
                     continue
                 elif len(trade_list) > 1: continue
                 for trade in trade_list:
                     timestamp = trade['timestamp']
-                    if time.time() - timestamp < self.wait + 2:
+                    if time.time() - timestamp < self.wait + 3:
                         par, tipo = trade['asset'], trade['type']
                         direcao = trade['order']
                         tempo = trade['timeframe']
                         if (par, timestamp) != ultimo:
                             ultimo = (par, timestamp)
-                            threading.Thread(target = self.ordem, daemon = True,
-                                args=(par, tipo, direcao, tempo)).start()
+                            threading.Thread(
+                                target = self.ordem, daemon = True,
+                                args = (par, tipo, direcao, tempo)
+                            ).start()
             except Exception as e: 
                 print(type(e), traceback.print_exc())
         eel.changeStatus()
@@ -130,8 +128,10 @@ def verify_connection(email, password):
         return None
     try:
         Api.read()
-        threading.Thread(target = api.auto_trade, 
-            daemon = True).start()
+        threading.Thread(
+            target = api.auto_trade, 
+            daemon = True
+        ).start()
         return True
     except: return False
 
@@ -140,7 +140,6 @@ def change_config(config):
     api.API.salvar_variaveis(config)
     api.timeframe = int(config.get("timeframe", 1))
     api.reverso = bool(config.get("reverso", False))
-    save_config()
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
 

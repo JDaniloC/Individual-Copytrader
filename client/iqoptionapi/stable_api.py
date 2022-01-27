@@ -196,8 +196,10 @@ class IQ_Option:
         self.api.Get_Leader_Board(country_id, user_country_id, from_position, to_position,
                                   near_traders_country_count, near_traders_count, top_country_count, top_count, top_type)
 
+        start = time.time()
         while self.api.leaderboard_deals_client == None:
-            pass
+            if time.time() - start > 40:
+                return None
         return self.api.leaderboard_deals_client
 
     def get_instruments(self, type):
@@ -510,6 +512,7 @@ class IQ_Option:
         cont = 0
         while True:
             try:
+                if ACTIVES not in OP_code.ACTIVES: return []
                 self.api.getcandles(
                     OP_code.ACTIVES[ACTIVES], interval, count, endtime)
                 contador = 0
@@ -525,7 +528,7 @@ class IQ_Option:
                 cont += 1 
                 logging.error('**error** (get_candles) precisa se reconectar')
                 self.connect()
-                if cont == 5:
+                if cont == 3:
                     return []
 
         return self.api.candles.candles_data
@@ -704,14 +707,17 @@ class IQ_Option:
         if ACTIVES in self.subscribe_mood == False:
             self.subscribe_mood.append(ACTIVES)
 
+        start = time.time()
         while True:
             self.api.subscribe_Traders_mood(
                 OP_code.ACTIVES[ACTIVES], instrument)
             try:
                 self.api.traders_mood[OP_code.ACTIVES[ACTIVES]]
-                break
+                return True
             except:
                 time.sleep(5)
+            if time.time() - start > 40:
+                return False
 
     def stop_mood_stream(self, ACTIVES, instrument="turbo-option"):
         if ACTIVES in self.subscribe_mood == True:
@@ -779,6 +785,7 @@ class IQ_Option:
 
     def check_win_v4(self, id_number):
         while True:
+            time.sleep(0.1)
             try:
                 if self.api.socket_option_closed[id_number] != None:
                     break
@@ -794,21 +801,57 @@ class IQ_Option:
                 return result['msg']['closed_options'][0]['win'], (result['msg']['closed_options'][0]['win_amount'] - result['msg']['closed_options'][0]['amount'] if result['msg']['closed_options'][0]['win'] != 'equal' else 0)
             time.sleep(1)
 
+    def get_open_trades(self, limit: int = 10):
+        """
+        Return the open trades information
+        """
+        def define_timeframe(order: dict):
+            timeframe = ((
+                order["expired"] 
+                - order["created"]
+            ) - 30) // 60
+            if timeframe < 1: timeframe = 1
+            elif timeframe < 5: timeframe = 5
+            elif timeframe < 15: timeframe = 15
+            elif timeframe < 30: timeframe = 30
+            elif timeframe < 60: timeframe = 60
+            return timeframe
+        
+        all_infos = self.get_optioninfo_v2(limit)['msg']
+        open_trades = all_infos.get('open_options', [])
+        win_amount = lambda order: order['win_amount'] - order['sum']
+        return [{
+            "timeframe": define_timeframe(order),
+            "win_amount": round(win_amount(order), 2),
+            "expiration": order['exp_time'],
+            "direction": order['dir'],
+            "asset": order['active'],
+            "value": order['value'],
+            "loss": order['sum'],
+            "id": order["id"]
+        } for order in open_trades]
+
     # Function by Danilo ( https://t.me/DaniloCarmo )
     def check_win_v5(self, id_number, mode, delay = 0):
         if mode != "digital":
-            result = self.get_optioninfo_v2(10)
-            order = None
-            for option in result['msg']['open_options']:
-                if option['id'] == id_number:
-                    order = option
-                    break
-            active = order['active']
+            order, count = None, 0
+            while order is None:
+                open_trades = self.get_open_trades()
+                for option in open_trades:
+                    if option['id'] == id_number:
+                        order = option
+                        break
+                if count == 5:
+                    return "error", 0
+                elif count > 0:
+                    time.sleep(0.1)
+                count += 1
+            lose = order['loss']
             value = order['value']
-            expiration = order['exp_time']
-            action = order['dir']
-            lose = order['sum']
-            win_amount = round(order['win_amount'] - lose, 2)
+            active = order['asset']
+            action = order['direction']
+            expiration = order['expiration']
+            win_amount = order["win_amount"]
         else:
             order = None
             while not order:

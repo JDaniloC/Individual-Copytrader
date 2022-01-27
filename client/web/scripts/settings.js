@@ -169,20 +169,18 @@ function saveChanges(config = null) {
     }
 }
 eel.expose(loadConfig)
-function loadConfig() {
+function loadConfig(configurationDefault = null) {
     function setValue(value, query) {
         document.querySelector(query).value = value;
     }
     let config = JSON.parse(localStorage.getItem('config'));
     if (config == null) {
-        return
+        return saveChanges(configurationDefault);
     }
     setValue(config.valor, "#valor")
     setValue(config.stoploss, "#settings #stoploss")
     setValue(config.stopwin, "#settings #stopwin")
-    setValue(config.scalper_loss, "#scalper_loss")
     setValue(config.tipo_martin, "#tipo_martin")
-    setValue(config.scalper_win, "#scalper_win")
     setValue(config.tipo_conta, "#tipo_conta")
     setValue(config.tipo_soros, "#tipo_soros")
     setValue(config.prestopwin, "#prestopwin")
@@ -200,6 +198,7 @@ function loadConfig() {
     
     setCiclos("#settings-ciclosgale ", config.ciclos_gale) 
     setCiclos("#settings-ciclossoros ", config.ciclos_soros) 
+    saveChanges(config);
     return config
 }
 eel.expose(addLog)
@@ -218,6 +217,7 @@ eel.expose(updateGeral)
 function updateGeral(date, hour, message) {
     let logs = document.querySelector("div.logs ul");
     let firstLog = logs.querySelector("li");
+    if (firstLog === null) return;
     firstLog.innerHTML = `
     <div>
         <p> ${date} </p> <p> ${hour} </p>
