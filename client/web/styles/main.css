@@ -78,48 +78,108 @@ section {
     z-index: 2;
 }
 
+section.login {
+    opacity: 1;
+    background-color: transparent;
+}
 section.login form {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    flex-direction: column;
     justify-content: space-around;
     
     padding: 1em;
     background-color: #fff;
     z-index: 2;
-}
-section.login form > div {
-    display: flex;
-    width: 100%;
-    font-size: 1.6em;
-    justify-content: space-between;
+    border-radius: 4px;
 }
 
-section.login form * {
-    font-size: 2em;
-    padding: 0.2em;
-}
 
-section.login form input {
-    width: 450px;
-    margin-bottom: 0.4em;
-}
 section.login form button {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 200px;
-    border-radius: 4px;
-    border-style: double;
+    width: 200px
 }
-section.login div * {
-    font-size: 1em;
+
+section.login header {
+    position: fixed;
+    top: 0em;
+    left: 0em;
+    padding: 1em 3em;
+    width: 100%;
+    font-weight: bolder;
+    font-size: x-large;
+    box-shadow: rgb(0 0 0 / 5%) 0px 0px 16px 1px;
 }
-section.login form button img#loading {
-    opacity: 1;
-    height: 1em;
-    width: 1em;
-    margin: 0;
+section.login header img {
+    width: 1.2em;
+}
+section.login form {
+    display: flex;
+    flex-direction: column;
+    width: 25em;
+    text-align: center;
+}
+section.login * {
+    transition: all .2s;
+}
+section.login form h1 {
+    font-weight: bold;
+}
+section.login form p {
+    color: red;
+    margin-bottom: 1em;
+}
+section.login form input {
+    margin-bottom: 1em;
+}
+section.login form button.access {
+    border: none;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 12px 20px;
+    color: #fff;
+    background-color: #35a947;
+}
+section.login form button.access:hover {
+    background-color: #2d8f3c;
+}
+section.login form button.access:disabled {
+    background-color: #ccc;
+}
+section.login form .buy {
+    background: #FFF;
+    border: 1px solid rgba(225, 225, 225, 1);
+    padding: 12px 16px;
+}
+section.login form .buy:hover {
+    background: rgb(250, 250, 250);
+}
+.separator {
+    position: relative;
+    margin: 1em 0;
+}
+.separator span {
+    padding: 0px 6px;
+}
+.separator div {
+    position: relative;
+    display: inline-block;
+    padding: 0px 6px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: rgb(255, 255, 255)
+}
+.separator:before {
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px solid rgb(225, 225, 225);
 }
 section button.close {
     width: 20px;

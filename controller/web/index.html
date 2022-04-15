@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles/trade.css">
     <link rel="stylesheet" href="styles/trade-map.css">
     <link rel="stylesheet" href="styles/popup.css">
+    <link rel="stylesheet" href="styles/boot.css">
 
     <script type="text/javascript" src="/eel.js"></script>
     <script type="text/javascript" src="script.js"></script>
@@ -21,21 +22,27 @@
     <section class="login">
     </section>
     <section class="login">
-        <form onsubmit= "login(event)">
-            <h2> CopyTrader Host Login </h2>
-            <input placeholder = "E-mail da IQ" type="email" required>
-            <input placeholder = "Senha" type="password" required>
-            <div style = "display: flex">
-                <button type = "submit"> Entrar </button>
-                <button type = "button" onclick = 
-                    "document.querySelector('#licensefile').click()"> 
-                    Procurar licença 
-                </button>
-                <input type="file" id="licensefile" 
-                    onchange = "searchLicense(this)"
-                    style = "display:none">
+        <form onsubmit = "login(event)">
+            <h1> Entrar </h1>
+            <p> </p>
+            <input class = "form-control form-control-lg" 
+                type="email" placeholder="E-mail da IQ" required>
+            <input class = "form-control form-control-lg" 
+                type="password" placeholder="Senha" required>
+            <button type = "submit" class = "access">
+                Entrar
+            </button>
+            <div class = "separator">
+                <div>
+                    <span>
+                        Ou compre uma licença
+                    </span>
+                </div>
             </div>
-            <sub id = "license"></sub>
+            <a class = "btn buy" 
+                href = "https://t.me/Tiagobots"> 
+                Comprar licença 
+            </a>
         </form>
     </section>
     <header>

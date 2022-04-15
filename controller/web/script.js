@@ -378,7 +378,9 @@ async function login(event) {
     const password = document.querySelector(".login input[type=password]").value
     const button = document.querySelector(".login button")
     button.innerText = 'Acessando...';
+    button.disabled = true;
     const result = await eel.login(email, password)();
+    button.disabled = false;
     if (result) {
         document.querySelectorAll("section.login").forEach(
             element => { element.style.display = "none" }) 
@@ -388,42 +390,12 @@ async function login(event) {
     captureCandles();
     generateAssets();
 }
-eel.expose(changeLicense)
-function changeLicense(email, texto) {
-    if (texto === "Renove sua licença") {
-        document.querySelector(
-            ".login button"
-        ).disabled = false;
-    }
-    document.querySelector(
-        "sub"
-    ).innerText = texto;
-    if (email != "") {
-        input = document.querySelector(
-            "input[type=email]")
-        input.value = email;
-        input.disabled = true;
-    }
-}
-
-function searchLicense(input) {
-    var reader = new FileReader(); 
-    reader.onload = function(){ 
-        let textFile = reader.result;
-        if (textFile) {
-            eel.search_license(textFile);
-        }
-    } 
-    if (input.value !== null) {
-      reader.readAsText(input.files[0]); 
-    }
-}
 
 eel.expose(changeData)
 function changeData(data) {
     document.title = data.titulo;
     document.querySelector(
-        ".login h2"
+        ".login h1"
     ).innerText = data.login;
     const nome = document.querySelector("header h1")
     if (nome) {

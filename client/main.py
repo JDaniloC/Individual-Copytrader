@@ -1,9 +1,8 @@
+import eel, time, json, threading, traceback, requests
 from utils.lista_taxa import ListaTaxa as Operacao
-import eel, time, json, threading, traceback
 
-from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-from os import listdir
+from datetime import datetime
 from api import Api
 
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
@@ -124,8 +123,17 @@ def change_operation():
 
 @eel.expose
 def verify_connection(email, password):
+    has_access, message = autenticar_licenca(email)
+    if not has_access:
+        eel.screenAlert(message)
+        return None
+
     if not api.login(email, password):
         return None
+    
+    today = datetime.now()
+    addLog(today.strftime("%d/%m/%Y"), 
+        today.strftime("%H:%M"), message)
     try:
         Api.read()
         threading.Thread(
@@ -143,7 +151,7 @@ def change_config(config):
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
 
-def get_data():
+def load_bot_data_info():
     f = Fernet(b'yqzmMSzGGdoYCfIu_OCE5VEQeDh5v5M6vqjDqhAGYk0=')
     try:
         with open("config/data.dll", "rb") as file:
@@ -158,65 +166,18 @@ def get_data():
         }
     eel.changeData(config)
 
-def devolve_restante(tempo_restante):
-    if  tempo_restante < 0:
-        mensagem = "Renove sua licença"
-        Api.main_url = None
-    else:
-        horas_minutos = timedelta(seconds = tempo_restante)
-        duracao = str(horas_minutos)[:-7].replace('days', 'dias')
-        if "dias" not in duracao:
-            duracao += "h"
-        mensagem = f"Sua licença dura {duracao}"
-    return mensagem
+def autenticar_licenca(email):
+    validacao, mensagem = False, "Adquira uma licença!"
+    try:
+        response = requests.get("https://licenciador.vercel.app/api/clients", 
+            params = { "email": email, "botName": "copytrader"}).json()
+        if "timestamp" in response and int(response["timestamp"]) > 0:
+            validacao, mensagem = True, response["message"]
+        else:
+            validacao, mensagem = False, "Compre uma licença!"
+    except:
+        validacao, mensagem = False, "Servidor em manutenção!"
+    return validacao, mensagem
 
-def procurar_licenca(filetext = ""):
-    f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
-    dia, mes, ano= 30, 6, 2021
-    email, hora, minuto = "", 0, 0
 
-    def decrypt(text):
-        message = f.decrypt(text).decode()
-        email, data, horario= message.split("|")
-        dia, mes, ano = list(map(int, data.split("/")))
-        hora, minuto = list(map(int, horario.split(":")))
-        return email, dia, mes, ano, hora, minuto
-
-    if filetext != "":
-        try:
-            email, dia, mes, ano, hora, minuto = decrypt(
-                filetext.encode("utf-8"))
-        except Exception as e: print(type(e), e); filetext = ""
-    else:
-        try:
-            files = listdir(".")
-            indice = list(map(lambda x:".key" in x, files)).index(True)
-            with open(f"{files[indice]}", "rb") as file:
-                email, dia, mes, ano, hora, minuto = decrypt(
-                    file.readline())
-        except:
-            try:
-                with open("license.key", "rb") as file:
-                    message = f.decrypt(file.readline()).decode()
-                    dia, mes, ano = list(map(int, message.split("/")))
-            except Exception as e: 
-                print(type(e), e)
-    data_final = datetime(ano, mes, dia, hora, minuto)
-    tempo_restante = datetime.timestamp(data_final
-        ) - datetime.timestamp(datetime.now())
-
-    mensagem = devolve_restante(tempo_restante)
-    return mensagem, email, filetext
-
-@eel.expose
-def search_license(text):
-    mensagem, email, filetext = procurar_licenca(text)
-    eel.changeLicense(email, mensagem)
-    if filetext != "":
-        with open("license.key", "wb") as file:
-            file.write(filetext.encode("utf-8"))
-
-get_data()
-
-mensagem, email, caminho = procurar_licenca()
-eel.changeLicense(email, mensagem)
+load_bot_data_info()

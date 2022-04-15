@@ -7,11 +7,10 @@ def escreve_erros(erro):
 
 try: 
     from iqoptionapi.stable_api import IQ_Option
-    import eel, time, threading, json
+    import eel, time, threading, json, requests
 
-    from datetime import datetime, timedelta
     from cryptography.fernet import Fernet
-    from os import listdir
+    from datetime import datetime
     from api import Api
 
     def timestamp_brazil():
@@ -292,6 +291,12 @@ try:
 
     @eel.expose
     def login(email, password):
+        has_access, message = autenticar_licenca(email)
+        if not has_access:
+            eel.animatePopUp("loss.svg", message)
+            return False
+
+        eel.animatePopUp("add.svg", message)
         if api.login(email, password):
             return True
         return False
@@ -342,7 +347,7 @@ try:
             daemon = True
         ).start()
 
-    def get_data():
+    def load_bot_data_info():
         f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
         try:
             with open("config/data.dll", "rb") as file:
@@ -357,69 +362,20 @@ try:
             }
         eel.changeData(config)
 
-    def devolve_restante(tempo_restante):
-        if  tempo_restante < 0:
-            mensagem = "Renove sua licença"
-            Api.main_url = None
-        else:
-            horas_minutos = timedelta(seconds = tempo_restante)
-            duracao = str(horas_minutos)[:-7].replace('days', 'dias')
-            if "dias" not in duracao:
-                duracao += "h"
-            mensagem = f"Sua licença dura {duracao}"
-        return mensagem
+    def autenticar_licenca(email):
+        validacao, mensagem = False, "Adquira uma licença!"
+        try:
+            response = requests.get("https://licenciador.vercel.app/api/clients", 
+                params = { "email": email, "botName": "copytrader-adm"}).json()
+            if "timestamp" in response and int(response["timestamp"]) > 0:
+                validacao, mensagem = True, response["message"]
+            else:
+                validacao, mensagem = False, "Compre uma licença!"
+        except:
+            validacao, mensagem = False, "Servidor em manutenção!"
+        return validacao, mensagem
 
-    def procurar_licenca(filetext = ""):
-        f = Fernet(b'Fnj2g3Lvtqg2Prswy6LwtbNGMmDjhVqHk0fsl2vAR_A=')
-        dia, mes, ano = 1, 7, 2021
-        email, hora, minuto = "", 0, 0
-
-        def decrypt(text):
-            message = f.decrypt(text).decode()
-            email, data, horario = message.split("|")
-            dia, mes, ano = list(map(int, data.split("/")))
-            hora, minuto = list(map(int, horario.split(":")))
-            return email, dia, mes, ano, hora, minuto
-
-        if filetext != "":
-            try:
-                email, dia, mes, ano, hora, minuto = decrypt(
-                    filetext.encode("utf-8"))
-            except Exception as e: print(type(e), e); filetext = ""
-        else:
-            try:
-                files = listdir(".")
-                indice = list(map(lambda x:".key" in x, files)).index(True)
-                with open(f"{files[indice]}", "rb") as file:
-                    email, dia, mes, ano, hora, minuto = decrypt(file.readline())
-            except Exception as e:
-                print(type(e), e)
-                try:
-                    with open("license.key", "rb") as file:
-                        message = f.decrypt(file.readline()).decode()
-                        dia, mes, ano = list(map(int, message.split("/")))
-                except Exception as e: 
-                    print(e)
-        
-        data_final = datetime(ano, mes, dia, hora, minuto)
-        tempo_restante = datetime.timestamp(data_final
-            ) - datetime.timestamp(datetime.now())
-
-        mensagem = devolve_restante(tempo_restante)
-        return mensagem, email, filetext
-
-    @eel.expose
-    def search_license(text):
-        mensagem, email, filetext = procurar_licenca(text)
-        eel.changeLicense(email, mensagem)
-        if filetext != "":
-            with open("license.key", "wb") as file:
-                file.write(filetext.encode("utf-8"))
-
-    get_data()
-
-    mensagem, email, caminho = procurar_licenca()
-    eel.changeLicense(email, mensagem)
+    load_bot_data_info()
     eel.start('index.html', port = 8001)
 except Exception as e:
     escreve_erros(e)

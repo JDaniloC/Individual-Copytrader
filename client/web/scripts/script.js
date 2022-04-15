@@ -140,13 +140,20 @@ function setResult(id, result) {
     document.querySelector(`li h3#id${id}`).innerText = result
 }
 
+eel.expose(screenAlert)
+function screenAlert(message) {
+    alert(message);
+}
+
 async function login(event) {
     event.preventDefault();
     const email = document.querySelector(".login input[type=email]").value
     const password = document.querySelector(".login input[type=password]").value
     const button = document.querySelector(".login button")
     button.innerText = 'Acessando...';
+    button.disabled = true;
     const result = await eel.verify_connection(email, password)();
+    button.disabled = false;
     if (result !== null) {
         document.querySelector(
             "section.login"
@@ -165,42 +172,12 @@ async function login(event) {
         button.innerText = 'Entrar';
     }
 }
-eel.expose(changeLicense)
-function changeLicense(email, texto) {
-    if (texto === "Renove sua licença") {
-        document.querySelector(
-            ".login button"
-        ).disabled = true;
-    }
-    document.querySelector(
-        "sub"
-    ).innerText = texto;
-    if (email != "") {
-        input = document.querySelector(
-            "input[type=email]")
-        input.value = email;
-        input.disabled = true;
-    }
-}
-
-function searchLicense(input) {
-    var reader = new FileReader(); 
-    reader.onload = function(){ 
-        let textFile = reader.result;
-        if (textFile) {
-            eel.search_license(textFile);
-        }
-    } 
-    if (input.value !== null) {
-      reader.readAsText(input.files[0]); 
-    }
-}
 
 eel.expose(changeData)
 function changeData(data) {
     document.title = data.titulo;
     document.querySelector(
-        ".login h2"
+        ".login h1"
     ).innerText = data.login;
     const nome = document.querySelector("header h1")
     if (nome) {
