@@ -22,7 +22,7 @@
     <section class="login">
     </section>
     <section class="login">
-        <form onsubmit = "login(event)">
+        <form onsubmit = "login(); event.preventDefault();">
             <h1> Entrar </h1>
             <p> </p>
             <input class = "form-control form-control-lg" 
@@ -114,7 +114,8 @@
                 <h2 style="color: #000"> Programar lista/taxas </h2>
                 <button onclick="closeList()"> x </button>
             </div>
-            <textarea name="lista" id="lista" placeholder="01/01/2000 23:59 EURUSD-OTC PUT M1" style="margin-top: 0px; margin-bottom: 0px; height: 228px;"></textarea>
+            <textarea name="lista" id="lista" placeholder="01/01/2000 23:59 EURUSD-OTC PUT M1" 
+                style="margin-top: 0px; margin-bottom: 0px; height: 228px;"></textarea>
         </div>
         <div>
             <button onclick = "startList()"> 
@@ -123,4 +124,11 @@
         </div>
     </div>
 </body>
+<script>
+    const account = JSON.parse(localStorage.getItem('account'));
+    if (account) {
+        document.querySelector(".login input[type=email]").value = account.email;
+        document.querySelector(".login input[type=password]").value = account.password;
+    }
+</script>
 </html>

@@ -145,8 +145,7 @@ function screenAlert(message) {
     alert(message);
 }
 
-async function login(event) {
-    event.preventDefault();
+async function login() {
     const email = document.querySelector(".login input[type=email]").value
     const password = document.querySelector(".login input[type=password]").value
     const button = document.querySelector(".login button")
@@ -162,6 +161,9 @@ async function login(event) {
             "section.overlay"
         ).style.display = "none"; 
         if (result) {
+            localStorage.setItem('account', JSON.stringify({
+                email, password
+            }))
             loadConfig();
             const status = document.querySelector("header div#status p");
             status.className = "online";
@@ -171,6 +173,7 @@ async function login(event) {
     } else {
         button.innerText = 'Entrar';
     }
+    return false;
 }
 
 eel.expose(changeData)

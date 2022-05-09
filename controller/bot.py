@@ -8,10 +8,10 @@ def escreve_erros(erro):
 try: 
     from iqoptionapi.stable_api import IQ_Option
     import eel, time, threading, json, requests
+    from socketclient import WebsocketClient
 
     from cryptography.fernet import Fernet
     from datetime import datetime
-    from api import Api
 
     def timestamp_brazil():
         return datetime.utcnow().timestamp() - 10800
@@ -135,6 +135,7 @@ try:
     class IQOption:
         def __init__(self):
             self.API = None
+            self.socket = None
             self.asset = "EURUSD"
             self.option = "digital"
             self.timeframe = 60
@@ -142,9 +143,13 @@ try:
             self.updating = False
         
         def login(self, email, password):
+            with open("./config/data.json") as file:
+                config = json.load(file)
             self.API = IQ_Option(email, password)
             self.API.connect()
             if self.API.check_connect():
+                self.socket = WebsocketClient(config['ip'], 4949)
+                self.socket.connect()
                 self.API.change_balance("PRACTICE")
                 threading.Thread(
                     target = self.searchTrades, 
@@ -219,10 +224,9 @@ try:
                         self.enviar_sinal(paridade, direcao, tempo, "binary")
                 time.sleep(0.5)
 
-        @staticmethod
-        def enviar_sinal(par, direcao, tempo, tipo, send = True):
+        def enviar_sinal(self, par, direcao, tempo, tipo, send = True):
             if send:
-                Api.write({"orders": [{
+                self.socket.send_message({"orders": [{
                     "asset": par, "order": direcao, "type": tipo,
                     "timeframe": tempo, "timestamp": time.time()
                 }]})
@@ -340,7 +344,7 @@ try:
 
     @eel.expose
     def seguir_lista(lista):
-        Api.write({"orders": lista})
+        api.socket.send_message({"orders": lista})
         threading.Thread(
             target=api.seguir_lista, 
             args = (lista, ),
@@ -365,7 +369,7 @@ try:
     def autenticar_licenca(email):
         validacao, mensagem = False, "Adquira uma licença!"
         try:
-            response = requests.get("https://licenciador.vercel.app/api/clients", 
+            response = requests.get("https://tiagobots.vercel.app/api/clients", 
                 params = { "email": email, "botName": "copytrader-adm"}).json()
             if "timestamp" in response and int(response["timestamp"]) > 0:
                 validacao, mensagem = True, response["message"]

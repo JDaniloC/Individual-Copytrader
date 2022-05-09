@@ -24,7 +24,7 @@
     <section class="overlay">
     </section>
     <section class="login">
-        <form onsubmit = "login(event)">
+        <form onsubmit = "login(); event.preventDefault();">
             <h1> Entrar </h1>
             <p> </p>
             <input class = "form-control form-control-lg" 
@@ -94,5 +94,10 @@
 </body>
 <script>
     $("section.config").load("components/config.html");
+    const account = JSON.parse(localStorage.getItem('account'));
+    if (account) {
+        $(".login input[type=email]").val(account.email);
+        $(".login input[type=password]").val(account.password);
+    }
 </script>
 </html>

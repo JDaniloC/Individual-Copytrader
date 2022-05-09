@@ -1,9 +1,9 @@
 import eel, time, json, threading, traceback, requests
 from utils.lista_taxa import ListaTaxa as Operacao
 
+from socketclient import WebsocketClient
 from cryptography.fernet import Fernet
 from datetime import datetime
-from api import Api
 
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 def updateGeral(*args, **kwargs): eel.updateGeral(*args, *kwargs)
@@ -15,6 +15,7 @@ def placeTrade(paridade, direcao, tempo, valor):
 class IQOption:
     def __init__(self):
         self.API = None
+        self.socket = None
         self.id = 0
         self.wait = 1
         self.inicio = 1
@@ -52,7 +53,6 @@ class IQOption:
             "tipo_stop": "fixo", "tipo_par": "auto", 
             "vez_gale": "vela",
         }
-
         try:
             eel.loadConfig(config)
             self.API = Operacao(config, addLog, 
@@ -74,13 +74,11 @@ class IQOption:
 
         return resultado
 
-    def auto_trade(self):
+    def auto_trade(self, response: dict):
         ultimo = ()
-        while (self.API.ganho_total < self.API.stopwin and 
+        if (self.API.ganho_total < self.API.stopwin and 
             self.API.ganho_total > -self.API.stoploss):
 
-            time.sleep(self.wait)
-            response = Api.read()
             try:
                 trade_list = response.get('orders', [])
                 if len(trade_list) > 1 and trade_list != self.lista_atual:
@@ -92,8 +90,8 @@ class IQOption:
                     threading.Thread(
                         target = self.API.operar_lista_taxas,
                         daemon = True).start()
-                    continue
-                elif len(trade_list) > 1: continue
+                    return
+                elif len(trade_list) > 1: return
                 for trade in trade_list:
                     timestamp = trade['timestamp']
                     if time.time() - timestamp < self.wait + 3:
@@ -135,13 +133,15 @@ def verify_connection(email, password):
     addLog(today.strftime("%d/%m/%Y"), 
         today.strftime("%H:%M"), message)
     try:
-        Api.read()
-        threading.Thread(
-            target = api.auto_trade, 
-            daemon = True
-        ).start()
+        with open("./config/data.json") as file:
+            config = json.load(file)
+        api.socket = WebsocketClient(
+                config['ip'], 4949, api.auto_trade)
+        api.socket.connect()
         return True
-    except: return False
+    except Exception as e:
+        print(type(e), e)
+    return False
 
 @eel.expose
 def change_config(config):
@@ -169,7 +169,7 @@ def load_bot_data_info():
 def autenticar_licenca(email):
     validacao, mensagem = False, "Adquira uma licença!"
     try:
-        response = requests.get("https://licenciador.vercel.app/api/clients", 
+        response = requests.get("https://tiagobots.vercel.app/api/clients", 
             params = { "email": email, "botName": "copytrader"}).json()
         if "timestamp" in response and int(response["timestamp"]) > 0:
             validacao, mensagem = True, response["message"]

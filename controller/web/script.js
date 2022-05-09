@@ -372,8 +372,7 @@ function createOrder(asset, order, type, timeframe) {
     }, 1000);
 }
 
-async function login(event) {
-    event.preventDefault();
+async function login() {
     const email = document.querySelector(".login input[type=email]").value
     const password = document.querySelector(".login input[type=password]").value
     const button = document.querySelector(".login button")
@@ -382,6 +381,9 @@ async function login(event) {
     const result = await eel.login(email, password)();
     button.disabled = false;
     if (result) {
+        localStorage.setItem('account', JSON.stringify({
+            email, password
+        }))
         document.querySelectorAll("section.login").forEach(
             element => { element.style.display = "none" }) 
     } else {
@@ -389,6 +391,7 @@ async function login(event) {
     }
     captureCandles();
     generateAssets();
+    return false;
 }
 
 eel.expose(changeData)
