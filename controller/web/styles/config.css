@@ -1,3 +1,30 @@
+:root {
+    --bg-dark: #FFF;
+    --bg-deep: #19202D;
+    --bg-normal: #252d44;
+    --bg-light: #2A334A;
+    
+    --bt-dark: #000;
+    --bt-normal: #3F475E; 
+    --bt-light: #464C59;
+    --bt-lighter: #EEE;
+
+    --green-dark: #2a9139;
+    --green-light: #3dbd40;
+
+    --red-dark: #db4931;
+    --red-light: #e04d25;
+}
+section.config {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+    top: 0;
+}
 div#settings {
     display: flex;
     align-items: center;
@@ -84,14 +111,14 @@ div#settings input[type=number] {
     border-right: none;
     border-radius: 4px 0 0 4px;
 }
-div#settings > div button {
+div#settings > button {
     background-color: var(--bg-dark);
     border: 1px solid #6c757d;
     border-radius: 4px;
     margin-top: 1em;
     padding: 1em;
 }
-div#settings > div button:hover {
+div#settings > button:hover {
     background: var(--bt-lighter);
 }
 

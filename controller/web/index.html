@@ -11,14 +11,23 @@
     <link rel="stylesheet" href="styles/trade-map.css">
     <link rel="stylesheet" href="styles/popup.css">
     <link rel="stylesheet" href="styles/boot.css">
+    <link rel="stylesheet" href="styles/config.css">
+    <link rel="stylesheet" href="styles/bootstrap.css">
 
     <script type="text/javascript" src="/eel.js"></script>
-    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="./scripts/script.js"></script>
+    <script type="text/javascript" src="./scripts/settings.js"></script>
+    <script type="text/javascript" src="./scripts/jquery.js"></script>
+    <script type="text/javascript" src="./scripts/bootstrap.js"></script>
+
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
 </head>
 <body> 
+    <section class="overlay">
+    </section>
     <section class="login">
     </section>
     <section class="login">
@@ -62,9 +71,15 @@
             </div>
             <ul class="others"></ul>
         </div>
+        <div style="font-size: x-large;">
+            <img src="images/gears.svg" alt="config img" 
+                id="config-btn" onclick="openConfig()">
+        </div>
     </header>
     <hr>
     <main>
+        <section class="config">
+        </section>
         <div class="trade list"></div>
         <div class="wrapper"> 
             <div class="trade-map"></div>
@@ -79,17 +94,15 @@
                     <option value="M15"> M15 </option>
                 </select>
             </div>
-            <div class="chooser">
-                <p> Amount </p>
-                <input onChange="changeAmount(this)" 
-                    type="number" min="0" max="20000" value = 2>
-            </div>
 
             <button id="call-btn" onclick = "placeCall()">
                 <img src="images/call.png" alt="Call button">
             </button>
             <button id="put-btn" onclick = "placePut()">
                 <img src="images/put.png" alt="Put button">
+            </button>
+            <button onClick="startMetatrader()">
+                MetaTrader
             </button>
             <button onClick="openList()">
                 Programar
@@ -102,7 +115,7 @@
             </button>
         </div>
     </main>
-    <div class="overlay" onwebkitAnimationEnd="removePopUp()">
+    <div class="overlay popup" onwebkitAnimationEnd="removePopUp()">
         <div>
             <img src="images/add.svg" alt="msg alert">
             <p> Ordem adicionada! </p>
@@ -125,6 +138,7 @@
     </div>
 </body>
 <script>
+    $("section.config").load("components/config.html");
     const account = JSON.parse(localStorage.getItem('account'));
     if (account) {
         document.querySelector(".login input[type=email]").value = account.email;

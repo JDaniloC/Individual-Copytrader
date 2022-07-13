@@ -26,14 +26,7 @@
         </li>
     </ul>
     <span id = "settings-geral">
-        <div class="form-floating">
-            <select class="form-select btn-secondary" id="tipo_conta" 
-                aria-label="Floating label select">
-                <option selected value="treino"> Treino </option>
-                <option value="real"> Real </option>
-            </select>
-            <label for="tipo_conta"> Tipo de conta </label>
-        </div>
+        
         <form class="form-floating">
             <span class="input-group-text"> $ </span>
             <input type="number" class="form-control" id="stopwin" 
@@ -65,7 +58,8 @@
         <form class="form-floating">
             <span class="input-group-text"> $ </span>
             <input type="number" class="form-control" id="valor" 
-                value="1" min = "1" max = "20000">
+                    value="1" min = "1" max = "20000"
+                    onChange="changeAmount(this)">
             <label for="valor"> Entrada </label>
             <span class = "input-stepper">
                 <button type = "button" class="plus"
@@ -194,6 +188,10 @@
             <span class="input-group-text"> % </span>
             <label for="prestopwin"> Pré-Stops </label>
         </form>
+        <div class="form-floating">
+            <input class="form-control" id="metatrader" placeholder="C://">
+            <label for="metatrader"> Caminho do MT4 </label>
+        </div>
     </span>
 
     <span id="settings-ciclosgale">
@@ -220,14 +218,9 @@
             </table>
         </span>
     </span>
-    <div style="display: flex">
-        <button onclick = "saveChanges()">
-            Salvar configuração
-        </button>
-        <button onclick = "loadFromAdmin()">
-            Carregar do ADM
-        </button>
-    </div>
+    <button onclick = "saveChanges()">
+        Enviar configuração
+    </button>
 </div>
 <script>
     $(function () {

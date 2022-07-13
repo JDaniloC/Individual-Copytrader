@@ -45,12 +45,11 @@ class Operacao(IQ_API):
             self.mudar_treino()
         else: self.mudar_real()
 
-        if config['tipo_par'] == "auto":
-            self.tipo = config['tipo_par']
+        tipo_par = config.get("tipo_par", "auto")
+        if tipo_par in ["auto", "digital"]:
+            self.tipo = tipo_par
         else:
-            self.tipo = "digital" if (
-                config['tipo_par'] == 'digital'
-            ) else "binary"
+            self.tipo = "binary"
 
         self.stopwin = config["stopwin"]
         self.stoploss = config["stoploss"]

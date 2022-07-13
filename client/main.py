@@ -1,5 +1,6 @@
 import eel, time, json, threading, traceback, requests
 from utils.lista_taxa import ListaTaxa as Operacao
+from api import Api
 
 from socketclient import WebsocketClient
 from cryptography.fernet import Fernet
@@ -135,8 +136,7 @@ def verify_connection(email, password):
     try:
         with open("./config/data.json") as file:
             config = json.load(file)
-        api.socket = WebsocketClient(
-                config['ip'], 4949, api.auto_trade)
+        api.socket = WebsocketClient(config['ip'], 4949, api.auto_trade)
         api.socket.connect()
         return True
     except Exception as e:
@@ -150,6 +150,14 @@ def change_config(config):
     api.reverso = bool(config.get("reverso", False))
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
+
+@eel.expose
+def load_from_admin():
+    new_config = Api.read()
+    api.API.salvar_variaveis(new_config)
+    eel.updateInfos(api.API.ganho_total, 
+        api.API.stopwin, api.API.stoploss)
+    eel.loadConfig(api.API.config)
 
 def load_bot_data_info():
     f = Fernet(b'yqzmMSzGGdoYCfIu_OCE5VEQeDh5v5M6vqjDqhAGYk0=')

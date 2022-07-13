@@ -1,4 +1,7 @@
-import re, traceback
+import re, traceback, csv
+from pathlib import Path
+from api import Api
+
 def escreve_erros(erro):
     linhas = " -> ".join(re.findall(
         r'line \d+', str(traceback.extract_tb(erro.__traceback__))))
@@ -224,6 +227,54 @@ try:
                         self.enviar_sinal(paridade, direcao, tempo, "binary")
                 time.sleep(0.5)
 
+        def path_to_metatrader(self, metatrader_path: str):
+            date_string = datetime.now().strftime("%Y%m%d")
+            log_file = Path(metatrader_path) / 'Files' / f'{date_string}_retorno.csv'
+            return log_file
+
+        def entradas_metatrader(self, metatrader_path: str):
+            '''
+            Abre o arquivo na pasta do metatrader
+            E devolve a lista de entradas.
+            '''
+            log_file = self.path_to_metatrader(metatrader_path)
+            procurando = False
+            while not procurando:
+                try:
+                    with open(log_file) as csv_file:
+                        csv_reader = csv.reader(csv_file, delimiter=',')
+                        csv_reader.__next__()
+                        csv_reader = list(csv_reader)
+                    return csv_reader
+                except PermissionError:
+                    time.sleep(0.3)
+                except Exception as error:
+                    escreve_erros(error)
+                    eel.animatePopUp("loss.svg",
+                        f"Ocorreu um erro na operação:\n {type(error)}: {error}")
+                    procurando = True
+            return False
+        
+        def enviar_metatrader(self, metatrader_path: str):
+            ultimos = []
+            eel.animatePopUp("equal.svg", f"Procurando entradas no metatrader...")
+            while True:
+                time.sleep(0.5)
+                entradas = self.entradas_metatrader(metatrader_path)
+                if not entradas: continue
+                delay = round(time.time()) - 2
+
+                for entrada in entradas:
+                    timestamp, paridade, direcao, timeframe = entrada
+                    timestamp, timeframe = int(timestamp), int(timeframe)
+                    paridade = paridade.strip().upper()
+                    direcao = direcao.upper()
+
+                    if delay <= timestamp and [paridade, timestamp] not in ultimos:
+                        ultimos.append([paridade, timestamp])
+                        eel.animatePopUp("win.svg", f"Metrader: {paridade} {direcao}")
+                        self.enviar_sinal(paridade, direcao, timeframe, "digital")
+
         def enviar_sinal(self, par, direcao, tempo, tipo, send = True):
             if send:
                 self.socket.send_message({"orders": [{
@@ -316,12 +367,26 @@ try:
         api.updating = False
         
     @eel.expose
+    def change_config(config: dict):
+        api.config = config
+        Api.write(config)
+        
+    @eel.expose
     def change_asset(asset):
         api.asset = asset['title'].replace(
             "/", "").replace(" (OTC)", "-OTC")
         api.option = asset['option'].lower()
         api.timeframe = asset['timeframe']
         api.amount = asset['amount']
+
+    @eel.expose
+    def start_metatrader(metatrader_path: str):
+        print(f"Iniciando metatrader em {metatrader_path}")
+        threading.Thread(
+            target=api.enviar_metatrader, 
+            args=(metatrader_path,),
+            daemon = True
+        ).start()
 
     @eel.expose
     def operate(direcao):
@@ -380,6 +445,7 @@ try:
         return validacao, mensagem
 
     load_bot_data_info()
-    eel.start('index.html', port = 8001)
+    print("Starting index.html")
+    eel.start('index.html', port = 8002)
 except Exception as e:
     escreve_erros(e)

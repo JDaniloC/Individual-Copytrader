@@ -112,7 +112,7 @@ function saveChanges(config = null) {
     }
 
     if (config == null) {
-        config = JSON.parse(localStorage.getItem('config'));
+        config = JSON.parse(localStorage.getItem('config')) || {};
 
         config.valor = parseFloat(getValue(
             "#valor", config.valor))
@@ -222,7 +222,4 @@ function updateGeral(date, hour, message) {
     <div>
         <p> ${date} </p> <p> ${hour} </p>
     </div> <p> ${message} </p>`
-}
-function loadFromAdmin() {
-    eel.load_from_admin();
 }

@@ -243,6 +243,11 @@ function captureCandles() {
 function stopCandles() {
     eel.stop_capture()
 }
+function startMetatrader() {
+    const metatraderPath = document.querySelector("#metatrader").value;
+    console.log("Calling metatrader", metatraderPath);
+    eel.start_metatrader(metatraderPath);
+}
 
 function openList() {
     document.querySelector(
@@ -326,13 +331,13 @@ function selectItemList(index) {
 }
 eel.expose(animatePopUp)
 function animatePopUp(img, text) {
-    const overlay = document.querySelector(".overlay");
+    const overlay = document.querySelector(".popup");
     overlay.querySelector("img").src = `images/${img}`;
     overlay.querySelector("p").innerText = text;
     overlay.id = "animated";
 }
 function removePopUp() {
-    const overlay = document.querySelector(".overlay");
+    const overlay = document.querySelector(".popup");
     overlay.removeAttribute("id")
 }
 
