@@ -20,7 +20,7 @@ main .trade .chooser p {
 }
 
 main .trade button {
-    padding: 2em;
+    padding: 2em 1em;
     margin: 4px;
     border: none;
     cursor: pointer;

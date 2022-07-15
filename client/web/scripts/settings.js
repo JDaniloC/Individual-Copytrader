@@ -98,6 +98,11 @@ function setCiclos(table, ciclos) {
     }
 }
 
+eel.expose(updateConfig)
+function updateConfig(config) {
+    localStorage.setItem('config', JSON.stringify(config));
+}
+
 eel.expose(saveChanges)
 function saveChanges(config = null) {
     function getValue(query, default_value = "") {
@@ -174,7 +179,7 @@ function loadConfig(configurationDefault = null) {
         document.querySelector(query).value = value;
     }
     let config = JSON.parse(localStorage.getItem('config'));
-    if (config == null) {
+    if (config == null || configurationDefault != null) {
         return saveChanges(configurationDefault);
     }
     setValue(config.valor, "#valor")

@@ -194,7 +194,7 @@ try:
                 total += volume
                 result.append({'dir': direction, 'volume': volume, "from": candle['from']})
 
-            factor = total / len(candles)
+            factor = (total / len(candles)) if len(candles) > 0 else 0
             variancia = 0
             for candle in result:
                 variancia += (candle['volume'] - factor) ** 2
@@ -445,7 +445,6 @@ try:
         return validacao, mensagem
 
     load_bot_data_info()
-    print("Starting index.html")
     eel.start('index.html', port = 8002)
 except Exception as e:
     escreve_erros(e)

@@ -157,6 +157,7 @@ def load_from_admin():
     api.API.salvar_variaveis(new_config)
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
+    eel.updateConfig(api.API.config)
     eel.loadConfig(api.API.config)
 
 def load_bot_data_info():
