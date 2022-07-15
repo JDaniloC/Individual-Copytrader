@@ -179,7 +179,7 @@ function loadConfig(configurationDefault = null) {
         document.querySelector(query).value = value;
     }
     let config = JSON.parse(localStorage.getItem('config'));
-    if (config == null || configurationDefault != null) {
+    if (config == null) {
         return saveChanges(configurationDefault);
     }
     setValue(config.valor, "#valor")

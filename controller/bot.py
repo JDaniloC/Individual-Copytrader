@@ -369,7 +369,23 @@ try:
     @eel.expose
     def change_config(config: dict):
         api.config = config
-        Api.write(config)
+        Api.write({
+            "valor": config["valor"],
+            "delay": config["delay"],
+            "stopwin": config["stopwin"],
+            "stoploss": config["stoploss"],
+            "vez_gale": config["vez_gale"],
+            "max_gale": config["max_gale"],
+            "tipo_stop": config["tipo_stop"],
+            "tipo_gale": config["tipo_gale"],
+            "max_soros": config["max_soros"],
+            "tipo_soros": config["tipo_soros"],
+            "prestopwin": config["prestopwin"],
+            "tipo_martin": config["tipo_martin"],
+            "ciclos_gale": config["ciclos_gale"],
+            "prestoploss": config["prestoploss"],
+            "ciclos_soros": config["ciclos_soros"]
+        })
         
     @eel.expose
     def change_asset(asset):

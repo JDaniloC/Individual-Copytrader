@@ -123,8 +123,6 @@ function saveChanges(config = null) {
             "#tipo_stop", config.tipo_stop)
         config.tipo_gale = getValue(
             "#tipo_gale", config.tipo_gale)
-        config.tipo_conta = getValue(
-            "#tipo_conta", config.tipo_conta)
         config.tipo_soros = getValue(
             "#tipo_soros", config.tipo_soros)
         
@@ -136,12 +134,8 @@ function saveChanges(config = null) {
             "#max_soros", config.max_soros))
         config.prestopwin = parseInt(getValue(
             "#prestopwin", config.prestopwin))
-        config.scalper_win = parseInt(getValue(
-            "#scalper_win", config.scalper_win))
         config.tipo_martin = getValue(
             "#tipo_martin", config.tipo_martin)
-        config.scalper_loss = parseInt(getValue(
-            "#scalper_loss", config.scalper_loss))
         config.stopwin = parseFloat(getValue(
             "#settings #stopwin", config.stopwin))
         config.stoploss = parseFloat(getValue(
@@ -181,7 +175,6 @@ function loadConfig(configurationDefault = null) {
     setValue(config.stoploss, "#settings #stoploss")
     setValue(config.stopwin, "#settings #stopwin")
     setValue(config.tipo_martin, "#tipo_martin")
-    setValue(config.tipo_conta, "#tipo_conta")
     setValue(config.tipo_soros, "#tipo_soros")
     setValue(config.prestopwin, "#prestopwin")
     setValue(config.tipo_gale, "#tipo_gale")

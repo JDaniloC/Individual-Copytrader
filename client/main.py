@@ -154,7 +154,8 @@ def change_config(config):
 @eel.expose
 def load_from_admin():
     new_config = Api.read()
-    api.API.salvar_variaveis(new_config)
+    api.API.config.update(new_config)
+    api.API.salvar_variaveis(api.API.config)
     eel.updateInfos(api.API.ganho_total, 
         api.API.stopwin, api.API.stoploss)
     eel.updateConfig(api.API.config)
