@@ -46,7 +46,7 @@ def connect_websocket(new_websocket):
         for websocket in websocket_list:
             if websocket is None:
                 remove_list.append(websocket)
-            if websocket != new_websocket:
+            elif websocket != new_websocket:
                 websocket.send(message)
         for websocket in remove_list:
             websocket_list.remove(websocket)
