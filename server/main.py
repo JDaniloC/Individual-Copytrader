@@ -42,9 +42,14 @@ def connect_websocket(new_websocket):
         print("Received message:", message)
         if message is None:
             break
+        remove_list = []
         for websocket in websocket_list:
-            if websocket != new_websocket:
+            if websocket is None:
+                remove_list.append(websocket)
+            elif websocket != new_websocket:
                 websocket.send(message)
+        for websocket in remove_list:
+            websocket_list.remove(websocket)
     websocket_list.remove(new_websocket)
     print("Websocket client disconnected.")
 
