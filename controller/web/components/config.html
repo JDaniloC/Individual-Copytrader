@@ -192,6 +192,29 @@
             <input class="form-control" id="metatrader" placeholder="C://">
             <label for="metatrader"> Caminho do MT4 </label>
         </div>
+        <div class="form-floating">
+            <select class="form-select btn-secondary" id="tradeAgainst" 
+                aria-label="Floating label select">
+                <option value="true"> Sim </option>
+                <option selected value="false"> Não </option>
+            </select>
+            <label for="tradeAgainst"> MT4: Cor oposta </label>
+        </div>
+        <form class="form-floating">
+            <input type="number" class="form-control" id="candlesPrev"
+                value="0" min = "0" max = "30" data-bs-trigger="focus" 
+                data-bs-toggle="popover" title="O que é?" 
+                data-bs-content = "A quantidade de velas anteriores a entrada atual do MT4 a qual quer comparar a favor ou contra.">
+            <label for="candlesPrev">Qnt. velas anteriores</label>
+            <span class = "input-stepper">
+                <button type = "button" class="plus"
+                    onclick="stepUp(this)">
+                </button>
+                <button type = "button" class="minus"
+                    onclick="stepDown(this)">
+                </button>
+            </span>
+        </form>
     </span>
 
     <span id="settings-ciclosgale">

@@ -255,7 +255,9 @@ try:
                     procurando = True
             return False
         
-        def enviar_metatrader(self, metatrader_path: str):
+        def enviar_metatrader(self, metatrader_path: str,
+                                    prev_candles: int = 0,
+                                    trade_against: bool = False):
             ultimos = []
             eel.animatePopUp("equal.svg", f"Procurando entradas no metatrader...")
             while True:
@@ -271,6 +273,22 @@ try:
                     direcao = direcao.upper()
 
                     if delay <= timestamp and [paridade, timestamp] not in ultimos:
+                        if prev_candles > 0:
+                            candles = self.API.get_candles(paridade, timeframe,
+                                                    prev_candles, time.time())
+                            if not candles: continue
+                            candle = candles[0]
+                            if candle['open'] < candle['close']:
+                                direcao = "CALL"
+                            elif candle['open'] > candle['close']:
+                                direcao = "PUT"
+                            else:
+                                eel.animatePopUp("equal.svg",
+                                                f"A {prev_candles}° anterior deu doji...")
+                                continue
+                        if trade_against:
+                            if direcao == "CALL": direcao = "PUT"
+                            else: direcao = "CALL"
                         ultimos.append([paridade, timestamp])
                         eel.animatePopUp("win.svg", f"Metrader: {paridade} {direcao}")
                         self.enviar_sinal(paridade, direcao, timeframe, "digital")
@@ -396,12 +414,10 @@ try:
         api.amount = asset['amount']
 
     @eel.expose
-    def start_metatrader(metatrader_path: str):
-        print(f"Iniciando metatrader em {metatrader_path}")
+    def start_metatrader(metatrader_path: str, prev_candles: int, trade_against: bool):
         threading.Thread(
-            target=api.enviar_metatrader, 
-            args=(metatrader_path,),
-            daemon = True
+            target = api.enviar_metatrader, daemon = True,
+            args = (metatrader_path, prev_candles, trade_against),
         ).start()
 
     @eel.expose
