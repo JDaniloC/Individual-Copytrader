@@ -245,8 +245,9 @@ function stopCandles() {
 }
 function startMetatrader() {
     const metatraderPath = document.querySelector("#metatrader").value;
-    console.log("Calling metatrader", metatraderPath);
-    eel.start_metatrader(metatraderPath);
+    const candlesPrev = parseInt(document.querySelector("#candlesPrev").value);
+    const tradeAgainst = document.querySelector("#tradeAgainst").value == "true";
+    eel.start_metatrader(metatraderPath, candlesPrev, tradeAgainst);
 }
 
 function openList() {
