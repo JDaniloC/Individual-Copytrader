@@ -1,6 +1,6 @@
 from iqoptionapi.stable_api import IQ_Option
 from datetime import datetime
-import time, random
+import time
 
 class IQ_API:
     def __init__(self, login, senha):
@@ -10,6 +10,8 @@ class IQ_API:
         self.asset, self.timeframe, self.payout_cache = False, False, {}
         self.API = IQ_Option(login, senha)
         self.last_user_id = 0
+        self.placeTrade = lambda *x: print(x)
+        self.placeResult = lambda *x: print(x)
         if not self.conectar():
             raise ConnectionError(" ❌ Não conseguiu se conectar, reveja a senha ❌ ")
 
@@ -126,18 +128,21 @@ class IQ_API:
         return:
             (resultado, lucro)
         '''
+        current_id = self.placeTrade(paridade, direcao, tempo, valor)
         direcao = direcao.lower()
 
         if self.config.get('prestoploss', False) and (
             self.perda_total - valor <= -self.stoploss):
             self.mostrar_mensagem("❌ Pré-stoploss: Fim da operação ❌")
             self.verificar_stop(True)
+            self.placeResult(current_id, "error")
             return 'error', 0, tipo
         elif self.config.get('prestopwin', 0) > 0:
             missing = (100 - self.config['prestopwin']) / 100
             if self.ganho_total >= self.stopwin * missing:
                 self.mostrar_mensagem("✅ Pré-stopwin: Fim da operação ✅")
                 self.verificar_stop(True)
+                self.placeResult(current_id, "error")
                 return 'error', 0, tipo
 
         if tipo == "binary" and tempo == 5:
@@ -173,6 +178,7 @@ class IQ_API:
                         tipo, bloqueador, delay, scalper, True)
                 else:
                     self.mostrar_mensagem(f"Payout na {tipo} está abaixo do aceitável {payout_atual}% < {self.config['minimo']}%")
+            self.placeResult(current_id, "error")
             return "error", 0, tipo
 
         self.mostrar_mensagem(f"✅ Trade realizado: {paridade} R$ {valor}")
@@ -198,6 +204,7 @@ class IQ_API:
             resultado, lucro = self.API.check_win_v5(
                 identificador, tipo, delay)
 
+        self.placeResult(current_id, resultado)
         return resultado, round(lucro, 2), tipo
 
     def scalper(self, identificador, valor, infos):

@@ -6,12 +6,21 @@ from socketclient import WebsocketClient
 from cryptography.fernet import Fernet
 from datetime import datetime
 
+def hitStop(): eel.hitStop()
 def addLog(*args, **kwargs): eel.addLog(*args, *kwargs)
 def updateGeral(*args, **kwargs): eel.updateGeral(*args, *kwargs)
 def placeTrade(paridade, direcao, tempo, valor): 
+    current_id = api.id
     paridade, direcao = paridade.upper(), direcao.upper()
-    eel.placeTrade(paridade, direcao, tempo, valor, api.id)
+    eel.placeTrade(paridade, direcao, tempo, valor, current_id)
     api.id += 1
+    return current_id
+
+def registerResult(id: int, resultado: str):
+    if resultado.upper() != "ERROR":
+        eel.updateInfos(api.API.ganho_total, 
+          api.API.stopwin, api.API.stoploss)
+    eel.setResult(id, resultado.upper())
 
 class IQOption:
     def __init__(self):
@@ -56,30 +65,20 @@ class IQOption:
         }
         try:
             eel.loadConfig(config)
-            self.API = Operacao(config, addLog, 
-                updateGeral, placeTrade)
+            self.API = Operacao(config, addLog, updateGeral,
+                        placeTrade, registerResult, hitStop)
             return True
         except Exception as e:
             print(type(e), e)
             return False
 
-    def ordem(self, par, tipo, direcao, tempo):
-        id = self.id
-        resultado = self.API.realizar_trade(self.API.valor, 
-            par, direcao, tempo, 0.7, tipo)
-
-        if resultado.upper() != "ERROR":
-            eel.setResult(id, resultado.upper())
-            eel.updateInfos(self.API.ganho_total, 
-                self.API.stopwin, self.API.stoploss)
-
-        return resultado
+    def can_trade(self):
+        return (self.API.ganho_total < self.API.stopwin and 
+                self.API.ganho_total > -self.API.stoploss)
 
     def auto_trade(self, response: dict):
         ultimo = ()
-        if (self.API.ganho_total < self.API.stopwin and 
-            self.API.ganho_total > -self.API.stoploss):
-
+        if self.can_trade():
             try:
                 trade_list = response.get('orders', [])
                 if len(trade_list) > 1 and trade_list != self.lista_atual:
@@ -97,17 +96,21 @@ class IQOption:
                     timestamp = trade['timestamp']
                     if time.time() - timestamp < self.wait + 3:
                         par, tipo = trade['asset'], trade['type']
-                        direcao = trade['order']
                         tempo = trade['timeframe']
+                        direcao = trade['order']
+                        if not self.can_trade():
+                            return eel.hitStop()
+
                         if (par, timestamp) != ultimo:
                             ultimo = (par, timestamp)
                             threading.Thread(
-                                target = self.ordem, daemon = True,
-                                args = (par, tipo, direcao, tempo)
+                                target = self.API.realizar_trade,
+                                daemon = True, args = (self.API.valor,
+                                    par, direcao, tempo, 0.7, tipo)
                             ).start()
             except Exception as e: 
                 print(type(e), traceback.print_exc())
-        eel.changeStatus()
+        else: eel.hitStop()
 
 api = IQOption()
 eel.init('web')
@@ -145,6 +148,10 @@ def verify_connection(email, password):
 
 @eel.expose
 def change_config(config):
+    if not api.can_trade():
+        eel.goOnline()
+        api.API.resetar_status()
+
     api.API.salvar_variaveis(config)
     api.timeframe = int(config.get("timeframe", 1))
     api.reverso = bool(config.get("reverso", False))

@@ -1,16 +1,15 @@
 import threading, time, amanobot
 from datetime import datetime
 from utils.IQ import IQ_API
-from pprint import pprint
 
 generic = lambda *x: print(x)
 
 class Operacao(IQ_API): 
-    def __init__(self, config, output = generic,
-        updateGeral = generic, placeTrade = generic):
+    def __init__(self, config, output = generic, updateGeral = generic,
+        placeTrade = generic, placeResult = generic, hitStop = generic):
         self.cadeado = threading.Lock()
         self.updateGeral = updateGeral
-        self.placeTrade = placeTrade
+        self.hitStop = hitStop
         self.output = output
         self.config = config
         self.entrou = False
@@ -36,6 +35,9 @@ class Operacao(IQ_API):
         if self.entrou:
             self.resetar_status()
             self.salvar_variaveis(config)
+
+        self.placeResult = placeResult
+        self.placeTrade = placeTrade
 
     def salvar_variaveis(self, config):
         self.config.update(config)
@@ -201,6 +203,7 @@ class Operacao(IQ_API):
 ✴️ Assertividade: {round(assertividade, 2)}%
                     ⚠️ Bot parado ⚠️''')
                 self.fim_da_operacao = True
+            self.hitStop()
             return True
         return False
 
@@ -259,8 +262,7 @@ class Operacao(IQ_API):
 
         return gale_text, num_gales
 
-    def realizar_trade(self, valor, paridade, ordem, tempo, 
-        payout, tipo):
+    def realizar_trade(self, valor, paridade, ordem, tempo, payout, tipo):
         '''
         Faz a operação e a depender da configuração faz:
         Martingale/Sorosgale e calcula o ganhoTotal/perdaTotal
@@ -306,6 +308,7 @@ class Operacao(IQ_API):
                 self.ganho_total -= round(abs(lucro), 2)
                 self.perda_total -= round(abs(lucro), 2)
             
+
             self.mostrar_mensagem(self.format_dir(f"""
 {paridade.upper()}|{tipo.capitalize()} M{tempo} {ordem.upper()}
 💠 Valor: $ {round(entrada, 2)} 
@@ -336,7 +339,6 @@ class Operacao(IQ_API):
                     f"🔸 Operando no {ciclo_atual + 1}° ciclo de {modalidade}: R$ {round(valor, 2)}")
 
         resultado, lucro = None, 0
-        self.placeTrade(paridade, ordem, tempo, valor)
         for _ in range(2):
             try:
                 resultado, lucro, tipo = self.ordem(
@@ -371,7 +373,6 @@ class Operacao(IQ_API):
                 is_ciclos_gale or tipo_gale == "martingale")):
                 perda, num_gales, ciclo_atual, errors = 0, 0, 0, 0
                 lucro_esperado = valor * payout
-                valor_inicial = valor
 
                 if is_ciclos_gale:
                     if tipo_gale == 'ciclos':

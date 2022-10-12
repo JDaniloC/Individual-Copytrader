@@ -81,10 +81,6 @@ class ListaTaxa(Operacao):
                 if self.verificar_tendencia(par, ordem, tempo):
                     continue
 
-                if (self.ativar_noticias and
-                    not self.verificar_noticias(par)):
-                        continue
-
                 if self.verificar_stop():
                     break
                 

@@ -193,10 +193,18 @@ function changeData(data) {
     }
 }
 
-eel.expose(changeStatus)
-function changeStatus() {
+eel.expose(hitStop)
+function hitStop() {
     const status = document.querySelector("header #status p");
     status.className = "offline";
     status.textContent = "Bateu em um Stop!";
     document.querySelector("header img").style.opacity = 0;
+}
+
+eel.expose(goOnline)
+function goOnline() {
+    const status = document.querySelector("header #status p");
+    status.className = "online";
+    status.textContent = "Online";
+    document.querySelector("header img").style.opacity = 1;
 }
