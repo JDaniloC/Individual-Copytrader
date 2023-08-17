@@ -58,10 +58,11 @@ bottle.route(
     callback = connect_websocket, 
     apply = (bottle_websocket.websocket,))
 
+websocket_list = []
+threading.Thread(
+    target = start_websocket_server,
+    daemon = True,
+).start()
+
 if __name__ == '__main__':
-    websocket_list = []
-    threading.Thread(
-        target = start_websocket_server,
-        daemon = True,
-    ).start()
     app.run(host='0.0.0.0', port = 5000)

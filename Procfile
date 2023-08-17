@@ -1,1 +1,1 @@
-back: python server/main.py
+back: gunicorn server.main:app
