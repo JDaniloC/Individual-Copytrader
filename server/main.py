@@ -7,13 +7,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 cors = CORS(app)
 
-websocket_started = False
 info_list = {}
 
 def start_websocket_server():
-    global websocket_started
-    if websocket_started: return
-    websocket_started = True
     print("Starting websocket server...")
     return bottle.run(
         port = 4949,

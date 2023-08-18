@@ -1,1 +1,2 @@
-back: gunicorn server.main:app
+back: gunicorn server.rest:app
+websocket: python server/websocket.py
