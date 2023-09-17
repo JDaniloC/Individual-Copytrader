@@ -151,7 +151,7 @@ try:
             self.API = IQ_Option(email, password)
             self.API.connect()
             if self.API.check_connect():
-                self.socket = WebsocketClient(config['ip'], 4949)
+                self.socket = WebsocketClient(config['ip'])
                 self.socket.connect()
                 self.API.change_balance("PRACTICE")
                 threading.Thread(

@@ -3,7 +3,7 @@ import requests, json
 arquivo = open("./config/data.json")
 class Api:
     config = json.load(arquivo)
-    main_url = f"http://{config.get('ip')}:5000/{config.get('id')}/"
+    main_url = f"http://{config.get('ip')}/{config.get('id')}/"
 
     @staticmethod
     def write(content):

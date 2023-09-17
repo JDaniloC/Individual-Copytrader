@@ -1,4 +1,4 @@
 {
-  "ip": "localhost",
-  "id": "telegram"
+    "ip": "localhost:4949",
+    "id": "teste"
 }

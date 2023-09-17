@@ -4,10 +4,10 @@ websocket_connection = {
     "status": False
 }
 class WebsocketClient:
-    def __init__(self, url: str, port: str):
+    def __init__(self, url: str):
         self.callback = {}
         self.connection = websocket_connection
-        url = f"ws://{url}:{port}/"
+        url = f"ws://{url}"
         self.wss = websocket.WebSocketApp(
             url, on_open = self.on_open,
             on_error = self.on_error, 

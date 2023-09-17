@@ -139,7 +139,7 @@ def verify_connection(email, password):
     try:
         with open("./config/data.json") as file:
             config = json.load(file)
-        api.socket = WebsocketClient(config['ip'], 4949, api.auto_trade)
+        api.socket = WebsocketClient(config['ip'], api.auto_trade)
         api.socket.connect()
         return True
     except Exception as e:
